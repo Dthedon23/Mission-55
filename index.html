@@ -2254,25 +2254,58 @@
       { keys: ['sugar'], unit: 'tsp', cal: 16, pro: 0, carb: 4, fat: 0 }
     ];
 
-    function autoCalculateCustomFood() {
+    function autoCalculateCustomFood() {async function fetchOnlineFood(query) {
+      try {
+        const cleanQuery = query.replace(/(\d+(?:\.\d+)?)\s*(g|gm|grams|ml|tsp|tbsp|scoop|scoops|katori|cup|cups|slice|slices|pc|pcs)?/gi, '').trim();
+        if (!cleanQuery) return null;
+        const url = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(cleanQuery)}&search_simple=1&action=process&json=1&page_size=5`;
+        const res = await fetch(url);
+        const data = await res.json();
+        const product = (data.products || []).find(p => p.nutriments && (p.nutriments['energy-kcal_100g'] || p.nutriments['energy-kcal']));
+        if (!product) return null;
+        const n = product.nutriments;
+        return {
+          name: product.product_name || cleanQuery,
+          unit: '100g',
+          cal: Number(n['energy-kcal_100g'] || n['energy-kcal'] || 0),
+          pro: Number(n.proteins_100g || n.proteins || 0),
+          carb: Number(n.carbohydrates_100g || n.carbohydrates || 0),
+          fat: Number(n.fat_100g || n.fat || 0)
+        };
+      } catch (e) {
+        return null;
+      }
+    }
+
+    async function autoCalculateCustomFood() {
       const inputEl = document.getElementById('cf-smart-input');
       const statusEl = document.getElementById('cf-smart-status');
       const raw = (inputEl?.value || '').trim().toLowerCase();
       if (!raw) return;
 
+      statusEl.textContent = 'Calculating ingredients...';
+      statusEl.classList.remove('hidden');
+
       const parts = raw.split(/\s*(?:,|&|\+|\band\b)\s*/i).filter(Boolean);
       let totalCal = 0, totalPro = 0, totalCarb = 0, totalFat = 0;
       const matched = [], missed = [];
 
-      parts.forEach(part => {
+      for (const part of parts) {
         const numMatch = part.match(/(\d+(?:\.\d+)?)\s*(g|gm|grams|ml|tsp|tbsp|scoop|scoops|katori|cup|cups|slice|slices|pc|pcs)?/i);
         const qty = numMatch ? parseFloat(numMatch[1]) : 1;
         const unitTyped = (numMatch && numMatch[2] ? numMatch[2].toLowerCase() : '');
 
-        const food = SMART_FOOD_DB.find(f => f.keys.some(k => part.includes(k)));
+        let food = SMART_FOOD_DB.find(f => f.keys.some(k => part.includes(k)));
+        let isOnline = false;
+
+        if (!food) {
+          food = await fetchOnlineFood(part);
+          isOnline = !!food;
+        }
+
         if (!food) {
           missed.push(part);
-          return;
+          continue;
         }
 
         let mult = qty;
@@ -2281,6 +2314,10 @@
             mult = qty / 100;
           } else if (unitTyped === 'katori' || unitTyped === 'cup' || unitTyped === 'cups') {
             mult = qty * 1.5;
+          } else if (unitTyped === 'tbsp') {
+            mult = qty * 0.15;
+          } else if (unitTyped === 'tsp') {
+            mult = qty * 0.05;
           } else if (qty > 15) {
             mult = qty / 100;
           }
@@ -2294,8 +2331,8 @@
         totalPro += food.pro * mult;
         totalCarb += food.carb * mult;
         totalFat += food.fat * mult;
-        matched.push(part);
-      });
+        matched.push(isOnline ? `${part} 🌐` : part);
+      }
 
       if (matched.length > 0) {
         const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
@@ -2309,13 +2346,12 @@
         setVal('cf-carb', totalCarb.toFixed(1));
         setVal('cf-fat', totalFat.toFixed(1));
 
-        statusEl.textContent = `Calculated: ${matched.join(' + ')}` + (missed.length ? ` (Couldn't recognize: ${missed.join(', ')})` : '');
-        statusEl.classList.remove('hidden');
+        statusEl.textContent = `Calculated: ${matched.join(' + ')}` + (missed.length ? ` (Not found: ${missed.join(', ')})` : '');
       } else {
-        statusEl.textContent = `Couldn't match "${raw}". Try items like: 2 egg white and 3 egg yellow, 100g paneer, 2 roti.`;
-        statusEl.classList.remove('hidden');
+        statusEl.textContent = `Couldn't find "${raw}". Try adding weight like "100g broccoli" or simpler names.`;
       }
-    }// =========================================================
+    }
+          }// =========================================================
     // PINNED TREND, WATER, GUT CHECK-IN & SHIFT MEAL PLANNER
     // =========================================================
     const SHIFT_STORE_KEY = 'm55_shift_plan_v1';
