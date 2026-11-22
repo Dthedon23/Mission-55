@@ -2295,25 +2295,72 @@
     }
 
     function autoCalculateCustomFood() {
+     async function fetchUSDAFood(part) {
+      try {
+        const cleanQuery = part
+          .replace(/(\d+(?:\.\d+)?)\s*(g|gm|grams|ml|tsp|tbsp|scoop|scoops|katori|cup|cups|slice|slices|pc|pcs)?/gi, '')
+          .trim();
+        if (!cleanQuery) return null;
+
+        const url = `https://api.nal.usda.gov/fdc/v1/foods/search?api_key=DEMO_KEY&query=${encodeURIComponent(cleanQuery)}&pageSize=3`;
+        const res = await fetch(url);
+        if (!res.ok) return null;
+        const data = await res.json();
+        const item = (data.foods || [])[0];
+        if (!item || !item.foodNutrients) return null;
+
+        const getNut = (num, name) => {
+          const n = item.foodNutrients.find(x => x.nutrientNumber === num || (x.nutrientName || '').toLowerCase().includes(name));
+          return n ? Number(n.value || 0) : 0;
+        };
+
+        const pro = getNut('203', 'protein');
+        const fat = getNut('204', 'total lipid');
+        const carb = getNut('205', 'carbohydrate');
+        const cal = getNut('208', 'energy') || Math.round((pro * 4) + (carb * 4) + (fat * 9));
+
+        const fetched = { keys: [cleanQuery.toLowerCase()], unit: '100g', cal, pro, carb, fat };
+
+        // Auto-save so it's instant next time
+        const saved = getSavedIngredients();
+        saved.unshift(fetched);
+        localStorage.setItem(CUSTOM_ING_KEY, JSON.stringify(saved));
+        return fetched;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    async function autoCalculateCustomFood() {
       const inputEl = document.getElementById('cf-smart-input');
       const statusEl = document.getElementById('cf-smart-status');
       const raw = (inputEl?.value || '').trim().toLowerCase();
       if (!raw) return;
+
+      statusEl.textContent = '🔍 Fetching nutrition data...';
+      statusEl.classList.remove('hidden');
 
       const allFoods = [...getSavedIngredients(), ...SMART_FOOD_DB];
       const parts = raw.split(/\s*(?:,|&|\+|\band\b)\s*/i).filter(Boolean);
       let totalCal = 0, totalPro = 0, totalCarb = 0, totalFat = 0;
       const matched = [], missed = [];
 
-      parts.forEach(part => {
+      for (const part of parts) {
         const numMatch = part.match(/(\d+(?:\.\d+)?)\s*(g|gm|grams|ml|tsp|tbsp|scoop|scoops|katori|cup|cups|slice|slices|pc|pcs)?/i);
         const qty = numMatch ? parseFloat(numMatch[1]) : 1;
         const unitTyped = (numMatch && numMatch[2] ? numMatch[2].toLowerCase() : '');
 
-        const food = allFoods.find(f => f.keys.some(k => part.includes(k)));
+        let food = allFoods.find(f => f.keys.some(k => part.includes(k)));
+        let isOnline = false;
+
+        if (!food) {
+          food = await fetchUSDAFood(part);
+          isOnline = !!food;
+        }
+
         if (!food) {
           missed.push(part);
-          return;
+          continue;
         }
 
         let mult = qty;
@@ -2339,8 +2386,8 @@
         totalPro += food.pro * mult;
         totalCarb += food.carb * mult;
         totalFat += food.fat * mult;
-        matched.push(part);
-      });
+        matched.push(isOnline ? `${part} 🌐` : part);
+      }
 
       const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
       if (matched.length > 0) {
@@ -2360,7 +2407,7 @@
         const btns = missed.map(m =>
           `<button type="button" onclick="addCustomIngredient('${m.replace(/'/g, "\\'")}')" class="underline font-bold text-indigo-700 ml-1">+ Add "${m}"</button>`
         ).join(' ');
-        html += (html ? '<br/>' : '') + `Not in list: ${btns}`;
+        html += (html ? '<br/>' : '') + `Not found online: ${btns}`;
       }
       statusEl.innerHTML = html;
       statusEl.classList.remove('hidden');
