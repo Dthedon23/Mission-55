@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Mission 61 — Friendly Health & Nutrition</title>
+  <title>Mission 55 — Friendly Health & Nutrition</title>
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -93,7 +93,7 @@
           61
         </div>
         <div>
-          <h1 class="font-extrabold text-xl tracking-tight text-slate-900">Mission 61</h1>
+          <h1 class="font-extrabold text-xl tracking-tight text-slate-900">Mission 55</h1>
           <p class="text-xs text-slate-500 font-medium">Kind, steady health ✨</p>
         </div>
       </div>
@@ -142,7 +142,7 @@
           61
         </div>
         <div>
-          <h1 class="font-extrabold text-lg leading-tight text-slate-900">Mission 61</h1>
+          <h1 class="font-extrabold text-lg leading-tight text-slate-900">Mission 55</h1>
           <p class="text-[11px] text-slate-500 font-medium">Health without guilt ✨</p>
         </div>
       </div>
@@ -610,7 +610,7 @@
           <div class="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl">🎯</div>
           <div>
             <h2 class="text-lg font-extrabold text-slate-900">Personalised Targets</h2>
-            <p class="text-xs text-slate-500">Tailor Mission 61 to your body and pace</p>
+            <p class="text-xs text-slate-500">Tailor Mission 55 to your body and pace</p>
           </div>
         </div>
 
@@ -1901,16 +1901,21 @@
     }
 
     function initSupabaseFromStorage() {
-      try {
-        const cfg = JSON.parse(localStorage.getItem(SB_CONFIG_KEY) || '{}');
-        if (cfg.url && cfg.key && window.supabase) {
-          sbClient = window.supabase.createClient(cfg.url, cfg.key);
-          checkSupabaseSession();
-        }
-      } catch (e) {
-        console.warn('Could not initialize Supabase:', e);
-      }
+  try {
+    const saved = JSON.parse(localStorage.getItem(SB_CONFIG_KEY) || '{}');
+    const cfg = {
+      url: saved.url || 'https://dkfkqrazmcyjvkzbdrvl.supabase.co',
+      key: saved.key || 'sb_publishable_6ef9CigBIIYtv9KfOFkihQ_prCmjkuM'
+    };
+    localStorage.setItem(SB_CONFIG_KEY, JSON.stringify(cfg));
+    if (cfg.url && cfg.key && window.supabase) {
+      sbClient = window.supabase.createClient(cfg.url, cfg.key);
+      checkSupabaseSession();
     }
+  } catch (e) {
+    console.warn('Could not initialize Supabase:', e);
+  }
+}
 
     function saveSupabaseConfig() {
       const url = document.getElementById('sb-url').value.trim();
