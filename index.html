@@ -2127,7 +2127,98 @@
       loadLocalState();
       initSupabaseFromStorage();
       switchTab('dashboard');
-    });
+    });// Smart Natural-Language Nutrition Auto-Calculator
+    const SMART_FOOD_DB = [
+      { keys: ['egg white', 'egg whites'], unit: 'pc', cal: 17, pro: 3.6, carb: 0.2, fat: 0.1 },
+      { keys: ['egg yellow', 'egg yellows', 'egg yolk', 'egg yolks', 'yolk', 'yolks'], unit: 'pc', cal: 55, pro: 2.7, carb: 0.6, fat: 4.5 },
+      { keys: ['whole egg', 'boiled egg', 'egg', 'eggs'], unit: 'pc', cal: 72, pro: 6.3, carb: 0.4, fat: 4.8 },
+      { keys: ['paneer', 'cottage cheese'], unit: '100g', cal: 265, pro: 18, carb: 3, fat: 20 },
+      { keys: ['chicken breast', 'chicken'], unit: '100g', cal: 165, pro: 31, carb: 0, fat: 3.6 },
+      { keys: ['roti', 'chapati', 'phulka'], unit: 'pc', cal: 100, pro: 3, carb: 20, fat: 0.8 },
+      { keys: ['paratha'], unit: 'pc', cal: 210, pro: 4.5, carb: 28, fat: 9 },
+      { keys: ['rice', 'cooked rice'], unit: '100g', cal: 130, pro: 2.7, carb: 28, fat: 0.3 },
+      { keys: ['dal', 'lentil', 'moong dal', 'toor dal'], unit: 'katori', cal: 150, pro: 9, carb: 22, fat: 2.5 },
+      { keys: ['oats'], unit: '100g', cal: 389, pro: 16.9, carb: 66, fat: 6.9 },
+      { keys: ['whey', 'whey protein', 'protein scoop'], unit: 'scoop', cal: 120, pro: 24, carb: 3, fat: 1.5 },
+      { keys: ['milk'], unit: '100ml', cal: 60, pro: 3.2, carb: 4.8, fat: 3.2 },
+      { keys: ['curd', 'dahi', 'yogurt'], unit: '100g', cal: 61, pro: 3.5, carb: 4.7, fat: 3.3 },
+      { keys: ['ghee', 'butter', 'oil'], unit: 'tsp', cal: 45, pro: 0, carb: 0, fat: 5 },
+      { keys: ['banana'], unit: 'pc', cal: 105, pro: 1.3, carb: 27, fat: 0.4 },
+      { keys: ['apple'], unit: 'pc', cal: 95, pro: 0.5, carb: 25, fat: 0.3 },
+      { keys: ['bread', 'brown bread', 'white bread'], unit: 'pc', cal: 75, pro: 2.5, carb: 14, fat: 1 },
+      { keys: ['peanut butter'], unit: 'tbsp', cal: 95, pro: 4, carb: 3, fat: 8 },
+      { keys: ['almonds', 'badam'], unit: 'pc', cal: 7, pro: 0.25, carb: 0.25, fat: 0.6 },
+      { keys: ['soya chunks', 'soya'], unit: '100g', cal: 345, pro: 52, carb: 33, fat: 0.5 },
+      { keys: ['tofu'], unit: '100g', cal: 76, pro: 8, carb: 1.9, fat: 4.8 },
+      { keys: ['potato', 'aloo'], unit: '100g', cal: 77, pro: 2, carb: 17, fat: 0.1 },
+      { keys: ['poha'], unit: '100g', cal: 130, pro: 2.5, carb: 25, fat: 2.5 },
+      { keys: ['idli'], unit: 'pc', cal: 58, pro: 2, carb: 12, fat: 0.4 },
+      { keys: ['dosa'], unit: 'pc', cal: 168, pro: 3.9, carb: 29, fat: 3.7 },
+      { keys: ['sugar'], unit: 'tsp', cal: 16, pro: 0, carb: 4, fat: 0 }
+    ];
+
+    function autoCalculateCustomFood() {
+      const inputEl = document.getElementById('cf-smart-input');
+      const statusEl = document.getElementById('cf-smart-status');
+      const raw = (inputEl?.value || '').trim().toLowerCase();
+      if (!raw) return;
+
+      const parts = raw.split(/\s*(?:,|&|\+|\band\b)\s*/i).filter(Boolean);
+      let totalCal = 0, totalPro = 0, totalCarb = 0, totalFat = 0;
+      const matched = [], missed = [];
+
+      parts.forEach(part => {
+        const numMatch = part.match(/(\d+(?:\.\d+)?)\s*(g|gm|grams|ml|tsp|tbsp|scoop|scoops|katori|cup|cups|slice|slices|pc|pcs)?/i);
+        const qty = numMatch ? parseFloat(numMatch[1]) : 1;
+        const unitTyped = (numMatch && numMatch[2] ? numMatch[2].toLowerCase() : '');
+
+        const food = SMART_FOOD_DB.find(f => f.keys.some(k => part.includes(k)));
+        if (!food) {
+          missed.push(part);
+          return;
+        }
+
+        let mult = qty;
+        if (food.unit === '100g' || food.unit === '100ml') {
+          if (unitTyped === 'g' || unitTyped === 'gm' || unitTyped === 'grams' || unitTyped === 'ml') {
+            mult = qty / 100;
+          } else if (unitTyped === 'katori' || unitTyped === 'cup' || unitTyped === 'cups') {
+            mult = qty * 1.5;
+          } else if (qty > 15) {
+            mult = qty / 100;
+          }
+        } else if (food.unit === 'tsp' && unitTyped === 'tbsp') {
+          mult = qty * 3;
+        } else if (food.unit === 'tbsp' && unitTyped === 'tsp') {
+          mult = qty / 3;
+        }
+
+        totalCal += food.cal * mult;
+        totalPro += food.pro * mult;
+        totalCarb += food.carb * mult;
+        totalFat += food.fat * mult;
+        matched.push(part);
+      });
+
+      if (matched.length > 0) {
+        const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
+        const nameEl = document.getElementById('cf-name');
+        const servingEl = document.getElementById('cf-serving');
+        if (nameEl && !nameEl.value.trim()) nameEl.value = inputEl.value.trim();
+        if (servingEl && !servingEl.value.trim()) servingEl.value = '1 custom bowl / plate';
+
+        setVal('cf-cal', Math.round(totalCal));
+        setVal('cf-pro', totalPro.toFixed(1));
+        setVal('cf-carb', totalCarb.toFixed(1));
+        setVal('cf-fat', totalFat.toFixed(1));
+
+        statusEl.textContent = `Calculated: ${matched.join(' + ')}` + (missed.length ? ` (Couldn't recognize: ${missed.join(', ')})` : '');
+        statusEl.classList.remove('hidden');
+      } else {
+        statusEl.textContent = `Couldn't match "${raw}". Try items like: 2 egg white and 3 egg yellow, 100g paneer, 2 roti.`;
+        statusEl.classList.remove('hidden');
+      }
+    }
   </script>
 </body>
 </html>
