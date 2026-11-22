@@ -2255,57 +2255,69 @@
     ];
 
     function autoCalculateCustomFood() {async function fetchOnlineFood(query) {
-      try {
-        const cleanQuery = query.replace(/(\d+(?:\.\d+)?)\s*(g|gm|grams|ml|tsp|tbsp|scoop|scoops|katori|cup|cups|slice|slices|pc|pcs)?/gi, '').trim();
-        if (!cleanQuery) return null;
-        const url = `https://world.openfoodfacts.org/cgi/search.pl?search_terms=${encodeURIComponent(cleanQuery)}&search_simple=1&action=process&json=1&page_size=5`;
-        const res = await fetch(url);
-        const data = await res.json();
-        const product = (data.products || []).find(p => p.nutriments && (p.nutriments['energy-kcal_100g'] || p.nutriments['energy-kcal']));
-        if (!product) return null;
-        const n = product.nutriments;
-        return {
-          name: product.product_name || cleanQuery,
-          unit: '100g',
-          cal: Number(n['energy-kcal_100g'] || n['energy-kcal'] || 0),
-          pro: Number(n.proteins_100g || n.proteins || 0),
-          carb: Number(n.carbohydrates_100g || n.carbohydrates || 0),
-          fat: Number(n.fat_100g || n.fat || 0)
-        };
-      } catch (e) {
-        return null;
-      }
+      try {async function fetchOnlineFood(query) {
+      try {// 1. Live Manual Macro-to-Calorie Calculator
+    function bindManualMacroCalc() {
+      ['cf-pro', 'cf-carb', 'cf-fat'].forEach(id => {
+        const el = document.getElementById(id);
+        if (!el || el.dataset.macroBound) return;
+        el.dataset.macroBound = '1';
+        el.addEventListener('input', () => {
+          const p = parseFloat(document.getElementById('cf-pro')?.value) || 0;
+          const c = parseFloat(document.getElementById('cf-carb')?.value) || 0;
+          const f = parseFloat(document.getElementById('cf-fat')?.value) || 0;
+          const calEl = document.getElementById('cf-cal');
+          if (calEl) calEl.value = Math.round((p * 4) + (c * 4) + (f * 9));
+        });
+      });
+    }
+    window.addEventListener('DOMContentLoaded', bindManualMacroCalc);
+
+    // 2. Custom Saved Ingredients + Smart Calculator
+    const CUSTOM_ING_KEY = 'm55_custom_ingredients_v1';
+
+    function getSavedIngredients() {
+      try { return JSON.parse(localStorage.getItem(CUSTOM_ING_KEY) || '[]'); }
+      catch (e) { return []; }
     }
 
-    async function autoCalculateCustomFood() {
+    function addCustomIngredient(rawName) {
+      const cleanName = rawName.replace(/(\d+(?:\.\d+)?)\s*(g|gm|grams|ml|tsp|tbsp|scoop|scoops|katori|cup|cups|slice|slices|pc|pcs)?/gi, '').trim().toLowerCase();
+      if (!cleanName) return;
+
+      const unitInput = prompt(`Enter unit for "${cleanName}" (type: pc, 100g, 100ml, tsp, or tbsp):`, '100g');
+      if (!unitInput) return;
+      const pro = parseFloat(prompt(`Protein (g) per ${unitInput} of "${cleanName}":`, '0')) || 0;
+      const carb = parseFloat(prompt(`Carbs (g) per ${unitInput} of "${cleanName}":`, '0')) || 0;
+      const fat = parseFloat(prompt(`Fat (g) per ${unitInput} of "${cleanName}":`, '0')) || 0;
+      const cal = Math.round((pro * 4) + (carb * 4) + (fat * 9));
+
+      const saved = getSavedIngredients();
+      saved.unshift({ keys: [cleanName], unit: unitInput.trim().toLowerCase(), cal, pro, carb, fat });
+      localStorage.setItem(CUSTOM_ING_KEY, JSON.stringify(saved));
+      autoCalculateCustomFood();
+    }
+
+    function autoCalculateCustomFood() {
       const inputEl = document.getElementById('cf-smart-input');
       const statusEl = document.getElementById('cf-smart-status');
       const raw = (inputEl?.value || '').trim().toLowerCase();
       if (!raw) return;
 
-      statusEl.textContent = 'Calculating ingredients...';
-      statusEl.classList.remove('hidden');
-
+      const allFoods = [...getSavedIngredients(), ...SMART_FOOD_DB];
       const parts = raw.split(/\s*(?:,|&|\+|\band\b)\s*/i).filter(Boolean);
       let totalCal = 0, totalPro = 0, totalCarb = 0, totalFat = 0;
       const matched = [], missed = [];
 
-      for (const part of parts) {
+      parts.forEach(part => {
         const numMatch = part.match(/(\d+(?:\.\d+)?)\s*(g|gm|grams|ml|tsp|tbsp|scoop|scoops|katori|cup|cups|slice|slices|pc|pcs)?/i);
         const qty = numMatch ? parseFloat(numMatch[1]) : 1;
         const unitTyped = (numMatch && numMatch[2] ? numMatch[2].toLowerCase() : '');
 
-        let food = SMART_FOOD_DB.find(f => f.keys.some(k => part.includes(k)));
-        let isOnline = false;
-
-        if (!food) {
-          food = await fetchOnlineFood(part);
-          isOnline = !!food;
-        }
-
+        const food = allFoods.find(f => f.keys.some(k => part.includes(k)));
         if (!food) {
           missed.push(part);
-          continue;
+          return;
         }
 
         let mult = qty;
@@ -2331,11 +2343,11 @@
         totalPro += food.pro * mult;
         totalCarb += food.carb * mult;
         totalFat += food.fat * mult;
-        matched.push(isOnline ? `${part} 🌐` : part);
-      }
+        matched.push(part);
+      });
 
+      const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
       if (matched.length > 0) {
-        const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val; };
         const nameEl = document.getElementById('cf-name');
         const servingEl = document.getElementById('cf-serving');
         if (nameEl && !nameEl.value.trim()) nameEl.value = inputEl.value.trim();
@@ -2345,11 +2357,17 @@
         setVal('cf-pro', totalPro.toFixed(1));
         setVal('cf-carb', totalCarb.toFixed(1));
         setVal('cf-fat', totalFat.toFixed(1));
-
-        statusEl.textContent = `Calculated: ${matched.join(' + ')}` + (missed.length ? ` (Not found: ${missed.join(', ')})` : '');
-      } else {
-        statusEl.textContent = `Couldn't find "${raw}". Try adding weight like "100g broccoli" or simpler names.`;
       }
+
+      let html = matched.length ? `✅ Calculated: ${matched.join(' + ')}` : '';
+      if (missed.length) {
+        const btns = missed.map(m =>
+          `<button type="button" onclick="addCustomIngredient('${m.replace(/'/g, "\\'")}')" class="underline font-bold text-indigo-700 ml-1">+ Add "${m}"</button>`
+        ).join(' ');
+        html += (html ? '<br/>' : '') + `Not in list: ${btns}`;
+      }
+      statusEl.innerHTML = html;
+      statusEl.classList.remove('hidden');
     }
           }// =========================================================
     // PINNED TREND, WATER, GUT CHECK-IN & SHIFT MEAL PLANNER
@@ -2551,7 +2569,35 @@
       }
     }, 30000);
 
-    window.addEventListener('DOMContentLoaded', loadShiftExtras);
+    window.addEventListener('DOMContentLoaded', loadShiftExtras);function exportMission55Backup() {
+      const data = {};
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        data[k] = localStorage.getItem(k);
+      }
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `mission55-backup-${new Date().toISOString().slice(0, 10)}.json`;
+      a.click();
+    }
+
+    function importMission55Backup(event) {
+      const file = event.target.files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const data = JSON.parse(e.target.result);
+          Object.keys(data).forEach(k => localStorage.setItem(k, data[k]));
+          alert('✅ Backup restored! Reloading Mission 55...');
+          location.reload();
+        } catch (err) {
+          alert('❌ Invalid backup file.');
+        }
+      };
+      reader.readAsText(file);
+    }
   </script>
 </body>
 </html>
