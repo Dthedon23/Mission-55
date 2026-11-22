@@ -1,0 +1,2116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Mission 61 — Friendly Health & Nutrition</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Chart.js CDN for 7-Day Calorie & Weight Trends -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <!-- Supabase JS v2 CDN for Cloud Sync & Auth -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <!-- Inter Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+          },
+          colors: {
+            cream: '#FAF9F6',
+            coral: {
+              50: '#FFF1F2',
+              100: '#FFE4E6',
+              400: '#FB7185',
+              500: '#F43F5E',
+              600: '#E11D48',
+            },
+          },
+        },
+      },
+    };
+  </script>
+
+  <style>
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background-color: #FAF9F6;
+      -webkit-tap-highlight-color: transparent;
+    }
+    /* Smooth custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #E2E8F0;
+      border-radius: 9999px;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    /* Progress ring animation */
+    .progress-ring-circle {
+      transition: stroke-dashoffset 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      transform: rotate(-90deg);
+      transform-origin: 50% 50%;
+    }
+    /* Fade transition for views */
+    .view-section {
+      animation: fadeIn 0.2s ease-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body class="text-slate-800 antialiased min-h-screen flex flex-col md:flex-row pb-24 md:pb-0">
+
+  <!-- ==================== DESKTOP LEFT SIDEBAR ==================== -->
+  <aside class="hidden md:flex md:flex-col md:w-64 lg:w-72 bg-white border-r border-slate-100 min-h-screen sticky top-0 h-screen p-6 justify-between shadow-sm z-30">
+    <div>
+      <!-- Brand Header -->
+      <div class="flex items-center gap-3 mb-8">
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-400 via-teal-500 to-indigo-500 flex items-center justify-center text-white font-extrabold text-lg shadow-md shadow-emerald-200">
+          61
+        </div>
+        <div>
+          <h1 class="font-extrabold text-xl tracking-tight text-slate-900">Mission 61</h1>
+          <p class="text-xs text-slate-500 font-medium">Kind, steady health ✨</p>
+        </div>
+      </div>
+
+      <!-- Desktop Navigation Links -->
+      <nav class="space-y-1.5" id="desktop-nav">
+        <button onclick="switchTab('dashboard')" data-tab="dashboard" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-semibold transition-all">
+          <span class="text-lg">🏡</span> Dashboard
+        </button>
+        <button onclick="switchTab('food')" data-tab="food" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-semibold transition-all">
+          <span class="text-lg">🥗</span> Food & Calories
+        </button>
+        <button onclick="switchTab('track')" data-tab="track" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-semibold transition-all">
+          <span class="text-lg">💚</span> Gut, Sleep & Move
+        </button>
+        <button onclick="switchTab('plan')" data-tab="plan" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-semibold transition-all">
+          <span class="text-lg">📊</span> Plan & Reports
+        </button>
+        <button onclick="switchTab('settings')" data-tab="settings" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-semibold transition-all">
+          <span class="text-lg">☁️</span> Targets & Sync
+        </button>
+      </nav>
+    </div>
+
+    <!-- Sidebar Cloud Status Footer -->
+    <div class="bg-slate-50 rounded-2xl p-4 border border-slate-100">
+      <div class="flex items-center justify-between mb-1.5">
+        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Storage</span>
+        <span id="sidebar-sync-badge" class="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800">
+          <span class="w-2 h-2 rounded-full bg-amber-500"></span> Local Only
+        </span>
+      </div>
+      <p class="text-xs text-slate-500 leading-relaxed">
+        No guilt, just awareness. Treats like Subway & tiramisu are always welcome here. 🍰
+      </p>
+    </div>
+  </aside>
+
+  <!-- ==================== MAIN CONTENT AREA ==================== -->
+  <main class="flex-1 w-full max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-5 md:py-8">
+
+    <!-- Mobile Top Header -->
+    <header class="flex md:hidden items-center justify-between mb-5">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-400 via-teal-500 to-indigo-500 flex items-center justify-center text-white font-extrabold text-sm shadow-sm">
+          61
+        </div>
+        <div>
+          <h1 class="font-extrabold text-lg leading-tight text-slate-900">Mission 61</h1>
+          <p class="text-[11px] text-slate-500 font-medium">Health without guilt ✨</p>
+        </div>
+      </div>
+      <button onclick="switchTab('settings')" id="mobile-sync-badge" class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-white border border-slate-200 text-slate-600 shadow-sm">
+        <span class="w-2 h-2 rounded-full bg-amber-400"></span> Local
+      </button>
+    </header>
+
+    <!-- Global Date Switcher Bar (Visible on Dashboard, Food, Track) -->
+    <div id="global-date-bar" class="flex items-center justify-between bg-white rounded-2xl p-2.5 shadow-sm border border-slate-100 mb-6">
+      <button onclick="changeDate(-1)" class="p-2.5 rounded-xl hover:bg-slate-100 active:scale-95 transition text-slate-600" aria-label="Previous day">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/></svg>
+      </button>
+      <div class="text-center">
+        <button onclick="goToToday()" class="group inline-flex flex-col items-center">
+          <span id="current-date-label" class="font-bold text-slate-800 text-sm sm:text-base">Today</span>
+          <span id="current-date-sub" class="text-xs text-slate-400 font-medium"></span>
+        </button>
+      </div>
+      <button onclick="changeDate(1)" class="p-2.5 rounded-xl hover:bg-slate-100 active:scale-95 transition text-slate-600" aria-label="Next day">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg>
+      </button>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- VIEW 1: DASHBOARD                                         -->
+    <!-- ========================================================= -->
+    <section id="view-dashboard" class="view-section space-y-6">
+
+      <!-- Greeting & Supportive Daily Banner -->
+      <div class="rounded-3xl bg-gradient-to-r from-indigo-500 via-purple-500 to-rose-400 p-5 sm:p-6 text-white shadow-lg shadow-indigo-100 relative overflow-hidden">
+        <div class="relative z-10">
+          <h2 id="dash-greeting" class="text-xl sm:text-2xl font-extrabold tracking-tight mb-1">Good evening, Friend! 👋</h2>
+          <p id="dash-encouragement" class="text-white/90 text-sm sm:text-base font-medium max-w-xl">
+            Balance is built over weeks, not one meal. Every small check-in counts!
+          </p>
+        </div>
+        <div class="absolute -right-6 -bottom-6 w-32 h-32 bg-white/10 rounded-full blur-xl"></div>
+      </div>
+
+      <!-- Calories & Macros Main Card -->
+      <div class="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-slate-100">
+        <div class="flex items-center justify-between mb-5">
+          <div>
+            <h3 class="font-bold text-slate-900 text-lg">Daily Nutrition</h3>
+            <p class="text-xs text-slate-500">Values are friendly estimates to guide you</p>
+          </div>
+          <span class="inline-flex items-center gap-1 bg-amber-50 text-amber-700 border border-amber-200 text-[11px] px-2.5 py-1 rounded-full font-semibold">
+            ~Est. Values
+          </span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-12 gap-6 items-center">
+          <!-- SVG Calorie Ring -->
+          <div class="sm:col-span-5 flex flex-col items-center justify-center">
+            <div class="relative w-44 h-44">
+              <svg class="w-full h-full" viewBox="0 0 140 140">
+                <circle cx="70" cy="70" r="58" fill="none" stroke="#F1F5F9" stroke-width="13" />
+                <circle id="cal-ring" class="progress-ring-circle" cx="70" cy="70" r="58" fill="none" stroke="url(#calGradient)" stroke-width="13" stroke-linecap="round" stroke-dasharray="364.42" stroke-dashoffset="364.42" />
+                <defs>
+                  <linearGradient id="calGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                    <stop offset="0%" stop-color="#10B981" />
+                    <stop offset="100%" stop-color="#6366F1" />
+                  </linearGradient>
+                </defs>
+              </svg>
+              <div class="absolute inset-0 flex flex-col items-center justify-center text-center px-2">
+                <span id="dash-cal-consumed" class="text-3xl font-extrabold text-slate-900 tracking-tight">0</span>
+                <span class="text-xs font-semibold text-slate-400">of <span id="dash-cal-target">2000</span> kcal</span>
+              </div>
+            </div>
+            <p id="dash-cal-status" class="mt-2 text-xs font-semibold text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full text-center">
+              2000 kcal remaining today
+            </p>
+          </div>
+
+          <!-- Macro Progress Bars -->
+          <div class="sm:col-span-7 space-y-4">
+            <!-- Protein -->
+            <div>
+              <div class="flex justify-between text-sm mb-1.5">
+                <span class="font-semibold text-slate-700 flex items-center gap-1.5">
+                  <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> Protein
+                </span>
+                <span class="font-bold text-slate-800">
+                  <span id="dash-protein">0</span>g <span class="text-slate-400 font-medium">/ <span id="dash-protein-target">120</span>g</span>
+                </span>
+              </div>
+              <div class="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
+                <div id="bar-protein" class="h-full bg-emerald-500 rounded-full transition-all duration-500" style="width: 0%"></div>
+              </div>
+            </div>
+
+            <!-- Carbs -->
+            <div>
+              <div class="flex justify-between text-sm mb-1.5">
+                <span class="font-semibold text-slate-700 flex items-center gap-1.5">
+                  <span class="w-2.5 h-2.5 rounded-full bg-amber-400"></span> Carbs
+                </span>
+                <span class="font-bold text-slate-800">
+                  <span id="dash-carbs">0</span>g <span class="text-slate-400 font-medium">/ <span id="dash-carbs-target">220</span>g</span>
+                </span>
+              </div>
+              <div class="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
+                <div id="bar-carbs" class="h-full bg-amber-400 rounded-full transition-all duration-500" style="width: 0%"></div>
+              </div>
+            </div>
+
+            <!-- Fat -->
+            <div>
+              <div class="flex justify-between text-sm mb-1.5">
+                <span class="font-semibold text-slate-700 flex items-center gap-1.5">
+                  <span class="w-2.5 h-2.5 rounded-full bg-rose-400"></span> Fats
+                </span>
+                <span class="font-bold text-slate-800">
+                  <span id="dash-fat">0</span>g <span class="text-slate-400 font-medium">/ <span id="dash-fat-target">65</span>g</span>
+                </span>
+              </div>
+              <div class="w-full h-3 bg-slate-100 rounded-full overflow-hidden">
+                <div id="bar-fat" class="h-full bg-rose-400 rounded-full transition-all duration-500" style="width: 0%"></div>
+              </div>
+            </div>
+
+            <!-- Quick Add Food Button -->
+            <div class="pt-2 flex flex-wrap gap-2">
+              <button onclick="switchTab('food')" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-sm py-2.5 px-4 rounded-2xl transition active:scale-95 flex items-center justify-center gap-2 shadow-sm">
+                <span>+</span> Log Food
+              </button>
+              <button onclick="switchTab('track')" class="flex-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-semibold text-sm py-2.5 px-4 rounded-2xl transition active:scale-95 flex items-center justify-center gap-2">
+                <span>✨</span> Check-in
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Wellness Summary Grid -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
+        <!-- Gut Card -->
+        <button onclick="switchTab('track')" class="text-left bg-white p-4 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition active:scale-98">
+          <div class="w-10 h-10 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl mb-3">🌿</div>
+          <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Gut Health</p>
+          <p id="dash-gut-summary" class="text-base font-bold text-slate-800 mt-0.5">Not logged</p>
+          <p id="dash-gut-sub" class="text-xs text-slate-500 mt-0.5 truncate">Tap to check in</p>
+        </button>
+
+        <!-- Sleep Card -->
+        <button onclick="switchTab('track')" class="text-left bg-white p-4 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition active:scale-98">
+          <div class="w-10 h-10 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl mb-3">🌙</div>
+          <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Sleep</p>
+          <p id="dash-sleep-summary" class="text-base font-bold text-slate-800 mt-0.5">-- hrs</p>
+          <p id="dash-sleep-sub" class="text-xs text-slate-500 mt-0.5 truncate">Tap to log rest</p>
+        </button>
+
+        <!-- Activity Card -->
+        <button onclick="switchTab('track')" class="text-left bg-white p-4 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition active:scale-98">
+          <div class="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl mb-3">👟</div>
+          <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Activity</p>
+          <p id="dash-activity-summary" class="text-base font-bold text-slate-800 mt-0.5">0 steps</p>
+          <p id="dash-activity-sub" class="text-xs text-slate-500 mt-0.5 truncate">Tap to add moves</p>
+        </button>
+
+        <!-- Weight Card -->
+        <button onclick="switchTab('plan')" class="text-left bg-white p-4 rounded-3xl border border-slate-100 shadow-sm hover:shadow-md transition active:scale-98">
+          <div class="w-10 h-10 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center text-xl mb-3">⚖️</div>
+          <p class="text-xs font-semibold text-slate-400 uppercase tracking-wide">Latest Weight</p>
+          <p id="dash-weight-summary" class="text-base font-bold text-slate-800 mt-0.5">-- kg</p>
+          <p id="dash-weight-sub" class="text-xs text-slate-500 mt-0.5 truncate">Goal: -- kg</p>
+        </button>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- VIEW 2: FOOD TRACKER & DATABASE                           -->
+    <!-- ========================================================= -->
+    <section id="view-food" class="view-section hidden space-y-6">
+
+      <!-- Search & Add Food Card -->
+      <div class="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-slate-100">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+          <div>
+            <h2 class="text-lg font-extrabold text-slate-900">Find & Log Food</h2>
+            <p class="text-xs text-slate-500">All portion nutrition values are clearly marked <span class="font-semibold text-amber-700">~Est.</span></p>
+          </div>
+          <button onclick="openCustomFoodModal()" class="text-xs font-bold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 px-3.5 py-2 rounded-xl transition active:scale-95">
+            + Create Custom Food
+          </button>
+        </div>
+
+        <!-- Meal Type Selector -->
+        <div class="grid grid-cols-4 gap-2 mb-4" id="meal-type-selector">
+          <button onclick="selectMealType('breakfast')" data-meal="breakfast" class="meal-pill py-2 px-2 rounded-xl text-xs sm:text-sm font-semibold border transition">🍳 Breakfast</button>
+          <button onclick="selectMealType('lunch')" data-meal="lunch" class="meal-pill py-2 px-2 rounded-xl text-xs sm:text-sm font-semibold border transition">🍛 Lunch</button>
+          <button onclick="selectMealType('dinner')" data-meal="dinner" class="meal-pill py-2 px-2 rounded-xl text-xs sm:text-sm font-semibold border transition">🍲 Dinner</button>
+          <button onclick="selectMealType('snack')" data-meal="snack" class="meal-pill py-2 px-2 rounded-xl text-xs sm:text-sm font-semibold border transition">🍰 Snack</button>
+        </div>
+
+        <!-- Search Input -->
+        <div class="relative mb-4">
+          <input id="food-search-input" type="text" oninput="renderFoodSearchResults()" placeholder="Search Roti, Dal, Paneer, Subway, Tiramisu, Chai..." class="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-400 focus:bg-white transition" />
+          <svg class="w-5 h-5 text-slate-400 absolute left-3.5 top-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35m0 0A7.5 7.5 0 1010.5 18a7.5 7.5 0 006.15-3.35z"/></svg>
+        </div>
+
+        <!-- Food Database Results List -->
+        <div id="food-search-results" class="space-y-2 max-h-72 overflow-y-auto pr-1">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+
+      <!-- Today's Logged Meals -->
+      <div class="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-slate-100">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-extrabold text-slate-900">Logged Meals</h3>
+          <span id="food-total-badge" class="text-xs font-bold bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full">0 kcal ~Est.</span>
+        </div>
+        <div id="logged-meals-container" class="space-y-5">
+          <!-- Populated dynamically -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- VIEW 3: WELLNESS TRACKER (GUT, SLEEP, ACTIVITY)           -->
+    <!-- ========================================================= -->
+    <section id="view-track" class="view-section hidden space-y-6">
+
+      <!-- 1. Gut Health Tracker -->
+      <div class="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-slate-100">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-11 h-11 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-2xl">🌿</div>
+          <div>
+            <h2 class="text-lg font-extrabold text-slate-900">Gut Health Tracker</h2>
+            <p class="text-xs text-slate-500">Notice patterns gently—your gut tells a story</p>
+          </div>
+        </div>
+
+        <div class="space-y-5">
+          <!-- Bowel Movement Counter -->
+          <div class="flex items-center justify-between bg-slate-50 p-4 rounded-2xl">
+            <div>
+              <p class="font-bold text-sm text-slate-800">Bowel Movements</p>
+              <p class="text-xs text-slate-500">Count for the day</p>
+            </div>
+            <div class="flex items-center gap-3">
+              <button onclick="adjustBowel(-1)" class="w-10 h-10 rounded-xl bg-white border border-slate-200 font-bold text-lg text-slate-700 hover:bg-slate-100 active:scale-95 transition">-</button>
+              <span id="gut-bm-count" class="w-8 text-center font-extrabold text-lg text-slate-900">0</span>
+              <button onclick="adjustBowel(1)" class="w-10 h-10 rounded-xl bg-amber-500 text-white font-bold text-lg hover:bg-amber-600 active:scale-95 transition shadow-sm">+</button>
+            </div>
+          </div>
+
+          <!-- Acidity Level (0-5) -->
+          <div>
+            <div class="flex justify-between items-center mb-2">
+              <label class="font-bold text-sm text-slate-800">Acidity Level (0 = None, 5 = High)</label>
+              <span id="gut-acidity-label" class="text-xs font-bold text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-full">0 / 5</span>
+            </div>
+            <div class="grid grid-cols-6 gap-2" id="acidity-scale">
+              <!-- Generated 0-5 buttons -->
+            </div>
+          </div>
+
+          <!-- Bloating Level (0-5) -->
+          <div>
+            <div class="flex justify-between items-center mb-2">
+              <label class="font-bold text-sm text-slate-800">Bloating Level (0 = Flat, 5 = Very Bloated)</label>
+              <span id="gut-bloating-label" class="text-xs font-bold text-rose-700 bg-rose-50 px-2.5 py-0.5 rounded-full">0 / 5</span>
+            </div>
+            <div class="grid grid-cols-6 gap-2" id="bloating-scale">
+              <!-- Generated 0-5 buttons -->
+            </div>
+          </div>
+
+          <!-- Gut Notes -->
+          <div>
+            <label class="block font-bold text-sm text-slate-800 mb-1.5">Quick Gut Notes</label>
+            <textarea id="gut-notes" rows="2" placeholder="e.g., Felt light after curd & rice, slight acidity after late chai..." class="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 focus:bg-white"></textarea>
+          </div>
+
+          <button onclick="saveGutLog()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-2xl text-sm transition active:scale-98 shadow-sm">
+            Save Gut Check-in
+          </button>
+        </div>
+      </div>
+
+      <!-- 2. Sleep Tracker -->
+      <div class="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-slate-100">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-11 h-11 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-2xl">🌙</div>
+          <div>
+            <h2 class="text-lg font-extrabold text-slate-900">Sleep & Routine</h2>
+            <p class="text-xs text-slate-500">Good rest powers better energy & digestion</p>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1.5">Bedtime</label>
+              <input id="sleep-bedtime" type="time" value="23:00" onchange="calculateSleepDuration()" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1.5">Wake-up Time</label>
+              <input id="sleep-waketime" type="time" value="07:00" onchange="calculateSleepDuration()" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between bg-indigo-50/70 px-4 py-3 rounded-2xl">
+            <span class="text-xs font-bold text-indigo-800">Estimated Sleep Duration</span>
+            <span id="sleep-duration-display" class="text-base font-extrabold text-indigo-700">8.0 hrs</span>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-2">Sleep Quality</label>
+            <div class="flex items-center gap-2" id="sleep-stars">
+              <!-- 1-5 stars -->
+            </div>
+          </div>
+
+          <button onclick="saveSleepLog()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-2xl text-sm transition active:scale-98 shadow-sm">
+            Save Sleep Log
+          </button>
+        </div>
+      </div>
+
+      <!-- 3. Activity Tracker -->
+      <div class="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-slate-100">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl">👟</div>
+          <div>
+            <h2 class="text-lg font-extrabold text-slate-900">Steps & Workouts</h2>
+            <p class="text-xs text-slate-500">All movement counts—even a 10-minute walk</p>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1.5">Daily Steps</label>
+            <div class="flex gap-2">
+              <input id="activity-steps" type="number" min="0" placeholder="0" class="flex-1 p-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-bold focus:outline-none focus:ring-2 focus:ring-emerald-400" />
+              <button onclick="addSteps(1000)" class="px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs rounded-2xl transition active:scale-95">+1,000</button>
+              <button onclick="addSteps(2500)" class="px-3.5 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs rounded-2xl transition active:scale-95">+2,500</button>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1.5">Workout Type</label>
+              <select id="activity-workout-type" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-400">
+                <option value="Walking">Walking</option>
+                <option value="Gym / Strength">Gym / Strength</option>
+                <option value="Yoga / Stretching">Yoga / Stretching</option>
+                <option value="Running / Jogging">Running / Jogging</option>
+                <option value="Cycling">Cycling</option>
+                <option value="Sports / Badminton">Sports / Badminton</option>
+                <option value="Rest Day">Rest Day 🛋️</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1.5">Minutes</label>
+              <input id="activity-minutes" type="number" min="0" placeholder="30" oninput="autoEstimateBurn()" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-400" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1.5">Burned (~Est. kcal)</label>
+              <input id="activity-burned" type="number" min="0" placeholder="150" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-400" />
+            </div>
+          </div>
+
+          <button onclick="saveActivityLog()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-2xl text-sm transition active:scale-98 shadow-sm">
+            Save Activity Log
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- VIEW 4: MEAL PLANNER & REPORTS                            -->
+    <!-- ========================================================= -->
+    <section id="view-plan" class="view-section hidden space-y-6">
+
+      <!-- Weight Logger & Trend Charts -->
+      <div class="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-slate-100">
+        <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+          <div>
+            <h2 class="text-lg font-extrabold text-slate-900">Weight & Weekly Trends</h2>
+            <p class="text-xs text-slate-500">Focus on the gentle trend over time, not daily fluctuations</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <input id="weight-input" type="number" step="0.1" min="20" max="300" placeholder="kg" class="w-24 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold focus:outline-none focus:ring-2 focus:ring-rose-400" />
+            <button onclick="logWeight()" class="bg-rose-500 hover:bg-rose-600 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition active:scale-95 shadow-sm">
+              Log Weight
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <!-- 7-Day Calorie Chart -->
+          <div class="bg-slate-50/70 p-4 rounded-2xl border border-slate-100">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-sm font-bold text-slate-800">7-Day Calories (~Est.)</h3>
+              <span class="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">Target: <span id="chart-cal-target-lbl">2000</span></span>
+            </div>
+            <div class="h-52 relative">
+              <canvas id="calorieChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Weight Trend Chart -->
+          <div class="bg-slate-50/70 p-4 rounded-2xl border border-slate-100">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-sm font-bold text-slate-800">Weight Trend (kg)</h3>
+              <span class="text-[11px] font-semibold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-full">Goal: <span id="chart-wt-target-lbl">--</span> kg</span>
+            </div>
+            <div class="h-52 relative">
+              <canvas id="weightChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Weekly Meal Planner -->
+      <div class="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-slate-100">
+        <div class="mb-4">
+          <h2 class="text-lg font-extrabold text-slate-900">Personalised Weekly Meal Planner</h2>
+          <p class="text-xs text-slate-500">Sketch a flexible plan for your week—swap anytime guilt-free</p>
+        </div>
+
+        <!-- Mon-Sun Tabs -->
+        <div class="flex gap-1.5 overflow-x-auto no-scrollbar pb-2 mb-4" id="planner-days-tabs">
+          <!-- Generated dynamically -->
+        </div>
+
+        <!-- Planned Meals List for Selected Day -->
+        <div id="planner-meals-list" class="space-y-3 mb-5">
+          <!-- Populated dynamically -->
+        </div>
+
+        <!-- Add Planned Meal Form -->
+        <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-3">
+          <p class="text-xs font-bold text-slate-700 uppercase tracking-wide">Add to <span id="planner-active-day-label">Mon</span> Plan</p>
+          <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
+            <select id="plan-meal-type" class="sm:col-span-3 p-2.5 bg-white border border-slate-200 rounded-xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-400">
+              <option value="breakfast">Breakfast</option>
+              <option value="lunch">Lunch</option>
+              <option value="dinner">Dinner</option>
+              <option value="snack">Snack</option>
+            </select>
+            <input id="plan-meal-text" type="text" placeholder="e.g., Paneer Bhurji + 2 Roti" class="sm:col-span-6 p-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+            <input id="plan-meal-cals" type="number" min="0" placeholder="~Est. kcal" class="sm:col-span-3 p-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+          </div>
+          <button onclick="addMealPlan()" class="w-full sm:w-auto bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-5 py-2.5 rounded-xl transition active:scale-95">
+            + Add to Weekly Plan
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================= -->
+    <!-- VIEW 5: SETTINGS, TARGETS & SUPABASE CLOUD SYNC           -->
+    <!-- ========================================================= -->
+    <section id="view-settings" class="view-section hidden space-y-6">
+
+      <!-- Personalised Nutrition Targets -->
+      <div class="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-slate-100">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl">🎯</div>
+          <div>
+            <h2 class="text-lg font-extrabold text-slate-900">Personalised Targets</h2>
+            <p class="text-xs text-slate-500">Tailor Mission 61 to your body and pace</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-bold text-slate-600 mb-1.5">Your Name</label>
+            <input id="set-name" type="text" placeholder="Friend" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-400" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1.5">Daily Calories Target (kcal)</label>
+            <input id="set-calories" type="number" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-400" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1.5">Target Weight (kg)</label>
+            <input id="set-weight" type="number" step="0.1" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-400" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1.5">Protein Target (g)</label>
+            <input id="set-protein" type="number" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-400" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1.5">Carbs Target (g)</label>
+            <input id="set-carbs" type="number" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-400" />
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-bold text-slate-600 mb-1.5">Fats Target (g)</label>
+            <input id="set-fat" type="number" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-400" />
+          </div>
+        </div>
+
+        <button onclick="saveTargets()" class="mt-5 w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-2xl text-sm transition active:scale-98 shadow-sm">
+          Save Personalised Targets
+        </button>
+      </div>
+
+      <!-- Supabase Cloud Sync Card -->
+      <div class="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-slate-100">
+        <div class="flex items-center justify-between gap-3 mb-4">
+          <div class="flex items-center gap-3">
+            <div class="w-11 h-11 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-2xl">☁️</div>
+            <div>
+              <h2 class="text-lg font-extrabold text-slate-900">Supabase Cloud Sync</h2>
+              <p class="text-xs text-slate-500">Sync across your phone & laptop for free</p>
+            </div>
+          </div>
+          <span id="settings-sync-status" class="text-xs font-bold px-3 py-1 rounded-full bg-amber-100 text-amber-800">Not Connected</span>
+        </div>
+
+        <!-- Step 1: Project URL & Anon Key -->
+        <div class="space-y-3 bg-slate-50 p-4 rounded-2xl border border-slate-100 mb-5">
+          <p class="text-xs font-bold text-slate-700">1. Connect your Supabase Project</p>
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-500 mb-1">Project URL</label>
+            <input id="sb-url" type="url" placeholder="https://your-project-id.supabase.co" class="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+          </div>
+          <div>
+            <label class="block text-[11px] font-semibold text-slate-500 mb-1">Anon / Public Key</label>
+            <input id="sb-key" type="password" placeholder="eyJhbGciOiJIUzI1NiIsInR5cCI6..." class="w-full p-2.5 bg-white border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+          </div>
+          <button onclick="saveSupabaseConfig()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold text-xs px-4 py-2.5 rounded-xl transition active:scale-95">
+            Save & Connect Keys
+          </button>
+        </div>
+
+        <!-- Step 2: Account Auth (Shown when configured) -->
+        <div id="sb-auth-section" class="space-y-4">
+          <!-- Logged Out View -->
+          <div id="sb-logged-out-view" class="space-y-3">
+            <p class="text-xs font-bold text-slate-700">2. Sign In or Create Cloud Account</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <input id="auth-email" type="email" placeholder="you@example.com" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+              <input id="auth-password" type="password" placeholder="Password (min 6 chars)" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+            </div>
+            <div class="flex flex-wrap gap-2.5">
+              <button onclick="handleSignIn()" class="flex-1 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm py-2.5 px-4 rounded-2xl transition active:scale-95">
+                Sign In
+              </button>
+              <button onclick="handleSignUp()" class="flex-1 bg-white hover:bg-slate-50 text-slate-800 border border-slate-200 font-bold text-sm py-2.5 px-4 rounded-2xl transition active:scale-95">
+                Sign Up
+              </button>
+            </div>
+          </div>
+
+          <!-- Logged In View -->
+          <div id="sb-logged-in-view" class="hidden bg-emerald-50/70 border border-emerald-100 rounded-2xl p-4 space-y-3">
+            <div class="flex items-center justify-between flex-wrap gap-2">
+              <div>
+                <p class="text-xs font-semibold text-emerald-700">Signed in as</p>
+                <p id="auth-user-email" class="text-sm font-extrabold text-slate-900"></p>
+              </div>
+              <div class="flex gap-2">
+                <button onclick="syncAllWithSupabase()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs px-4 py-2 rounded-xl transition active:scale-95">
+                  🔄 Sync Now
+                </button>
+                <button onclick="handleSignOut()" class="bg-white hover:bg-rose-50 text-rose-600 border border-rose-200 font-bold text-xs px-3.5 py-2 rounded-xl transition active:scale-95">
+                  Sign Out
+                </button>
+              </div>
+            </div>
+            <p class="text-[11px] text-emerald-800/80">Your food logs, gut, sleep, activity, weight, meal plans, and targets automatically sync to your Supabase database.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==================== MOBILE STICKY BOTTOM NAV ==================== -->
+  <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200/80 px-2 py-2 z-40 shadow-lg">
+    <div class="grid grid-cols-5 gap-1 max-w-md mx-auto">
+      <button onclick="switchTab('dashboard')" data-tab="dashboard" class="mobile-nav-btn flex flex-col items-center justify-center py-1.5 rounded-2xl transition">
+        <span class="text-xl leading-none mb-1">🏡</span>
+        <span class="text-[10px] font-bold">Home</span>
+      </button>
+      <button onclick="switchTab('food')" data-tab="food" class="mobile-nav-btn flex flex-col items-center justify-center py-1.5 rounded-2xl transition">
+        <span class="text-xl leading-none mb-1">🥗</span>
+        <span class="text-[10px] font-bold">Food</span>
+      </button>
+      <button onclick="switchTab('track')" data-tab="track" class="mobile-nav-btn flex flex-col items-center justify-center py-1.5 rounded-2xl transition">
+        <span class="text-xl leading-none mb-1">💚</span>
+        <span class="text-[10px] font-bold">Track</span>
+      </button>
+      <button onclick="switchTab('plan')" data-tab="plan" class="mobile-nav-btn flex flex-col items-center justify-center py-1.5 rounded-2xl transition">
+        <span class="text-xl leading-none mb-1">📊</span>
+        <span class="text-[10px] font-bold">Plan</span>
+      </button>
+      <button onclick="switchTab('settings')" data-tab="settings" class="mobile-nav-btn flex flex-col items-center justify-center py-1.5 rounded-2xl transition">
+        <span class="text-xl leading-none mb-1">☁️</span>
+        <span class="text-[10px] font-bold">Sync</span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ==================== MODAL: PORTION CALCULATOR ==================== -->
+  <div id="portion-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-5">
+      <div class="flex items-start justify-between gap-2">
+        <div>
+          <span class="inline-block text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200 px-2 py-0.5 rounded-full mb-1">~Est. Nutrition</span>
+          <h3 id="pm-food-name" class="text-lg font-extrabold text-slate-900">Food Name</h3>
+          <p id="pm-serving-size" class="text-xs text-slate-500">1 serving</p>
+        </div>
+        <button onclick="closePortionModal()" class="p-2 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-700">✕</button>
+      </div>
+
+      <!-- Multiplier Quick Buttons -->
+      <div>
+        <label class="block text-xs font-bold text-slate-600 mb-2">Portion Multiplier</label>
+        <div class="grid grid-cols-4 gap-2 mb-2.5">
+          <button onclick="setPortionMultiplier(0.5)" class="pm-mult-btn py-2 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition">0.5x</button>
+          <button onclick="setPortionMultiplier(1)" class="pm-mult-btn py-2 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition">1x</button>
+          <button onclick="setPortionMultiplier(1.5)" class="pm-mult-btn py-2 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition">1.5x</button>
+          <button onclick="setPortionMultiplier(2)" class="pm-mult-btn py-2 rounded-xl text-xs font-bold bg-slate-100 hover:bg-slate-200 text-slate-700 transition">2x</button>
+        </div>
+        <input id="pm-custom-qty" type="number" step="0.1" min="0.1" value="1" oninput="updatePortionPreview()" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-center focus:outline-none focus:ring-2 focus:ring-emerald-400" />
+      </div>
+
+      <!-- Live Macro Preview -->
+      <div class="grid grid-cols-4 gap-2 bg-slate-50 p-3.5 rounded-2xl text-center">
+        <div>
+          <p class="text-[10px] font-bold text-slate-400 uppercase">Calories</p>
+          <p id="pm-preview-cal" class="text-base font-extrabold text-slate-900">0</p>
+        </div>
+        <div>
+          <p class="text-[10px] font-bold text-emerald-600 uppercase">Protein</p>
+          <p id="pm-preview-pro" class="text-base font-extrabold text-emerald-700">0g</p>
+        </div>
+        <div>
+          <p class="text-[10px] font-bold text-amber-600 uppercase">Carbs</p>
+          <p id="pm-preview-carb" class="text-base font-extrabold text-amber-700">0g</p>
+        </div>
+        <div>
+          <p class="text-[10px] font-bold text-rose-500 uppercase">Fat</p>
+          <p id="pm-preview-fat" class="text-base font-extrabold text-rose-600">0g</p>
+        </div>
+      </div>
+
+      <!-- Meal Type Picker -->
+      <div>
+        <label class="block text-xs font-bold text-slate-600 mb-1.5">Add to Meal</label>
+        <select id="pm-meal-type" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-400">
+          <option value="breakfast">🍳 Breakfast</option>
+          <option value="lunch">🍛 Lunch</option>
+          <option value="dinner">🍲 Dinner</option>
+          <option value="snack">🍰 Snack</option>
+        </select>
+      </div>
+
+      <button onclick="confirmAddFoodLog()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3.5 rounded-2xl text-sm transition active:scale-98 shadow-md shadow-emerald-100">
+        Add to Today's Log
+      </button>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL: CREATE CUSTOM FOOD ==================== -->
+  <div id="custom-food-modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="text-lg font-extrabold text-slate-900">Create & Save Custom Food</h3>
+        <button onclick="closeCustomFoodModal()" class="p-2 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-700">✕</button>
+      </div>
+
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Food Name</label>
+          <input id="cf-name" type="text" placeholder="e.g., Homemade Moong Dal Chilla" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-600 mb-1">Serving Size</label>
+          <input id="cf-serving" type="text" placeholder="e.g., 1 piece (80g)" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">Calories (kcal)</label>
+            <input id="cf-cal" type="number" min="0" placeholder="180" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">Protein (g)</label>
+            <input id="cf-pro" type="number" min="0" step="0.1" placeholder="9" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">Carbs (g)</label>
+            <input id="cf-carb" type="number" min="0" step="0.1" placeholder="22" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1">Fat (g)</label>
+            <input id="cf-fat" type="number" min="0" step="0.1" placeholder="5" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+          </div>
+        </div>
+      </div>
+
+      <button onclick="saveCustomFood()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-2xl text-sm transition active:scale-98">
+        Save to Food Database
+      </button>
+    </div>
+  </div>
+
+  <!-- ==================== TOAST NOTIFICATION ==================== -->
+  <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none max-w-xs w-full"></div>
+
+  <!-- ==================== APPLICATION LOGIC ==================== -->
+  <script>
+    // =========================================================================
+    // 1. DEFAULT PRE-LOADED INDIAN & EVERYDAY FOOD DATABASE (~Estimated Values)
+    // =========================================================================
+    const BUILTIN_FOODS = [
+      { id: 'b1', name: 'Roti / Chapati (Whole Wheat)', serving_size: '1 medium (40g)', calories: 105, protein_g: 3.5, carbs_g: 20, fat_g: 0.8, is_estimated: true },
+      { id: 'b2', name: 'Dal Tadka', serving_size: '1 katori (150g)', calories: 165, protein_g: 8.5, carbs_g: 20, fat_g: 5.5, is_estimated: true },
+      { id: 'b3', name: 'Steamed Rice (White)', serving_size: '1 cup cooked (150g)', calories: 195, protein_g: 4, carbs_g: 42, fat_g: 0.4, is_estimated: true },
+      { id: 'b4', name: 'Paneer Bhurji', serving_size: '1 bowl (150g)', calories: 285, protein_g: 16, carbs_g: 7, fat_g: 21, is_estimated: true },
+      { id: 'b5', name: 'Kanda / Veg Poha', serving_size: '1 plate (180g)', calories: 250, protein_g: 5, carbs_g: 42, fat_g: 7, is_estimated: true },
+      { id: 'b6', name: 'Idli Sambar', serving_size: '2 idlis + 1 bowl sambar', calories: 230, protein_g: 7.5, carbs_g: 42, fat_g: 3, is_estimated: true },
+      { id: 'b7', name: 'Plain Dosa', serving_size: '1 medium', calories: 170, protein_g: 4, carbs_g: 28, fat_g: 4.5, is_estimated: true },
+      { id: 'b8', name: 'Boiled Egg', serving_size: '1 large egg', calories: 75, protein_g: 6.3, carbs_g: 0.6, fat_g: 5.3, is_estimated: true },
+      { id: 'b9', name: 'Masala Omelette', serving_size: '2 eggs', calories: 210, protein_g: 13, carbs_g: 2.5, fat_g: 16, is_estimated: true },
+      { id: 'b10', name: 'Grilled Chicken Breast', serving_size: '100g cooked', calories: 165, protein_g: 31, carbs_g: 0, fat_g: 3.6, is_estimated: true },
+      { id: 'b11', name: 'Curd / Dahi (Homemade)', serving_size: '1 bowl (150g)', calories: 95, protein_g: 5, carbs_g: 7, fat_g: 5, is_estimated: true },
+      { id: 'b12', name: 'Masala Chai (with milk & sugar)', serving_size: '1 cup (150ml)', calories: 90, protein_g: 2.5, carbs_g: 14, fat_g: 2.5, is_estimated: true },
+      { id: 'b13', name: 'Banana', serving_size: '1 medium (118g)', calories: 105, protein_g: 1.3, carbs_g: 27, fat_g: 0.4, is_estimated: true },
+      { id: 'b14', name: 'Rolled Oats (Cooked in water/milk)', serving_size: '50g dry oats', calories: 190, protein_g: 6.5, carbs_g: 34, fat_g: 3.5, is_estimated: true },
+      { id: 'b15', name: 'Whey Protein Shake', serving_size: '1 scoop (30g)', calories: 120, protein_g: 24, carbs_g: 3, fat_g: 1.5, is_estimated: true },
+      { id: 'b16', name: 'Subway 6-inch Veggie Delite', serving_size: '1 sub (with light sauces)', calories: 280, protein_g: 9, carbs_g: 46, fat_g: 5, is_estimated: true },
+      { id: 'b17', name: 'Subway 6-inch Chicken Teriyaki', serving_size: '1 sub', calories: 380, protein_g: 25, carbs_g: 54, fat_g: 6, is_estimated: true },
+      { id: 'b18', name: 'Tiramisu Slice 🍰', serving_size: '1 slice (~100g)', calories: 320, protein_g: 5.5, carbs_g: 34, fat_g: 18, is_estimated: true },
+      { id: 'b19', name: 'Rajma Chawal', serving_size: '1 medium bowl', calories: 340, protein_g: 11, carbs_g: 58, fat_g: 6.5, is_estimated: true },
+      { id: 'b20', name: 'Roasted Makhana', serving_size: '1 bowl (30g)', calories: 110, protein_g: 3, carbs_g: 22, fat_g: 1, is_estimated: true },
+    ];
+
+    const ENCOURAGEMENTS = [
+      "Balance is built over weeks, not one meal. Keep showing up!",
+      "Progress beats perfection every single day. You've got this! ✨",
+      "Had a Subway or tiramisu? Enjoy it fully—health includes joy too! 🍰",
+      "Small daily check-ins create massive long-term wins. Proud of you!",
+      "Hydrate, breathe, and nourish yourself kindly today. 💚"
+    ];
+
+    const DAYS_OF_WEEK = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    const STORAGE_KEY = 'mission61_data_v1';
+    const SB_CONFIG_KEY = 'mission61_sb_config';
+
+    // =========================================================================
+    // 2. APPLICATION STATE
+    // =========================================================================
+    let state = {
+      profile: {
+        full_name: 'Friend',
+        target_calories: 2000,
+        target_protein_g: 120,
+        target_carbs_g: 220,
+        target_fat_g: 65,
+        target_weight_kg: 68,
+      },
+      customFoods: [],
+      foodLogs: [],      // { id, log_date, meal_type, food_name, quantity, calories, protein_g, carbs_g, fat_g, is_estimated }
+      gutLogs: {},       // keyed by YYYY-MM-DD
+      sleepLogs: {},     // keyed by YYYY-MM-DD
+      activityLogs: {},  // keyed by YYYY-MM-DD
+      mealPlans: [],     // { id, day_of_week, meal_type, planned_meal, est_calories }
+      weightLogs: [],    // { id, log_date, weight_kg }
+    };
+
+    let activeTab = 'dashboard';
+    let selectedDate = getTodayStr();
+    let selectedMealType = 'breakfast';
+    let selectedPlannerDay = getCurrentDayShort();
+    let activePortionFood = null;
+    let gutDraft = { bowel_movement_count: 0, acidity_level: 0, bloating_level: 0, notes: '' };
+    let sleepQualityDraft = 4;
+
+    // Chart.js instances
+    let calorieChartInstance = null;
+    let weightChartInstance = null;
+
+    // Supabase client & auth state
+    let sbClient = null;
+    let currentUser = null;
+
+    // =========================================================================
+    // 3. DATE & UTILITY HELPERS
+    // =========================================================================
+    function getTodayStr() {
+      const now = new Date();
+      const offset = now.getTimezoneOffset();
+      const local = new Date(now.getTime() - offset * 60000);
+      return local.toISOString().split('T')[0];
+    }
+
+    function getCurrentDayShort() {
+      const map = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+      return map[new Date().getDay()];
+    }
+
+    function formatDisplayDate(dateStr) {
+      const today = getTodayStr();
+      const [y, m, d] = dateStr.split('-').map(Number);
+      const dt = new Date(y, m - 1, d);
+      const formatted = dt.toLocaleDateString('en-IN', { weekday: 'short', day: 'numeric', month: 'short' });
+      if (dateStr === today) return { main: 'Today', sub: formatted };
+      return { main: formatted, sub: y.toString() };
+    }
+
+    function generateLocalId() {
+      if (crypto && crypto.randomUUID) return crypto.randomUUID();
+      return 'loc_' + Date.now() + '_' + Math.random().toString(36).slice(2, 9);
+    }
+
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      const colors = {
+        success: 'bg-slate-900 text-white border-slate-700',
+        info: 'bg-indigo-600 text-white border-indigo-500',
+        warn: 'bg-amber-500 text-white border-amber-400',
+      };
+      toast.className = `${colors[type] || colors.success} px-4 py-3 rounded-2xl shadow-lg border text-xs sm:text-sm font-semibold pointer-events-auto transition-all duration-300 transform translate-y-0 opacity-100`;
+      toast.textContent = message;
+      container.appendChild(toast);
+      setTimeout(() => {
+        toast.classList.add('opacity-0', '-translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 3000);
+    }
+
+    // =========================================================================
+    // 4. LOCAL STORAGE PERSISTENCE
+    // =========================================================================
+    function loadLocalState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          state = {
+            ...state,
+            ...parsed,
+            profile: { ...state.profile, ...(parsed.profile || {}) },
+          };
+        }
+      } catch (err) {
+        console.error('Failed to load local state:', err);
+      }
+    }
+
+    function saveLocalState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      } catch (err) {
+        console.error('Failed to save local state:', err);
+      }
+    }
+
+    // =========================================================================
+    // 5. NAVIGATION & DATE SWITCHING
+    // =========================================================================
+    function switchTab(tab) {
+      activeTab = tab;
+      ['dashboard', 'food', 'track', 'plan', 'settings'].forEach(t => {
+        document.getElementById(`view-${t}`).classList.toggle('hidden', t !== tab);
+      });
+
+      // Show/hide global date bar
+      const showDateBar = ['dashboard', 'food', 'track'].includes(tab);
+      document.getElementById('global-date-bar').classList.toggle('hidden', !showDateBar);
+
+      // Update Desktop Nav styling
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        const isActive = btn.dataset.tab === tab;
+        btn.className = `nav-btn w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-semibold transition-all ${
+          isActive
+            ? 'bg-emerald-50 text-emerald-700 shadow-sm'
+            : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
+        }`;
+      });
+
+      // Update Mobile Nav styling
+      document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
+        const isActive = btn.dataset.tab === tab;
+        btn.className = `mobile-nav-btn flex flex-col items-center justify-center py-1.5 rounded-2xl transition ${
+          isActive ? 'text-emerald-600 bg-emerald-50/80' : 'text-slate-400'
+        }`;
+      });
+
+      renderAll();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function changeDate(deltaDays) {
+      const [y, m, d] = selectedDate.split('-').map(Number);
+      const dt = new Date(y, m - 1, d + deltaDays);
+      const offset = dt.getTimezoneOffset();
+      const local = new Date(dt.getTime() - offset * 60000);
+      selectedDate = local.toISOString().split('T')[0];
+      renderAll();
+    }
+
+    function goToToday() {
+      selectedDate = getTodayStr();
+      renderAll();
+    }
+
+    // =========================================================================
+    // 6. RENDERING: DASHBOARD
+    // =========================================================================
+    function renderDashboard() {
+      // Greeting
+      const hr = new Date().getHours();
+      const greetPrefix = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
+      const name = state.profile.full_name || 'Friend';
+      document.getElementById('dash-greeting').textContent = `${greetPrefix}, ${name}! 👋`;
+
+      // Compute daily nutrition totals
+      const dayLogs = state.foodLogs.filter(l => l.log_date === selectedDate);
+      const totals = dayLogs.reduce((acc, item) => {
+        acc.cal += Number(item.calories) || 0;
+        acc.pro += Number(item.protein_g) || 0;
+        acc.carb += Number(item.carbs_g) || 0;
+        acc.fat += Number(item.fat_g) || 0;
+        return acc;
+      }, { cal: 0, pro: 0, carb: 0, fat: 0 });
+
+      const tCal = Number(state.profile.target_calories) || 2000;
+      const tPro = Number(state.profile.target_protein_g) || 120;
+      const tCarb = Number(state.profile.target_carbs_g) || 220;
+      const tFat = Number(state.profile.target_fat_g) || 65;
+
+      // Update numbers
+      document.getElementById('dash-cal-consumed').textContent = Math.round(totals.cal);
+      document.getElementById('dash-cal-target').textContent = tCal;
+
+      // Ring progress (capped at 100% visually, never harsh red)
+      const circumference = 2 * Math.PI * 58; // 364.42
+      const ratio = Math.min(totals.cal / tCal, 1);
+      document.getElementById('cal-ring').style.strokeDashoffset = circumference * (1 - ratio);
+
+      // Guilt-free calorie status pill
+      const diff = Math.round(tCal - totals.cal);
+      const statusEl = document.getElementById('dash-cal-status');
+      const encEl = document.getElementById('dash-encouragement');
+      if (diff >= 0) {
+        statusEl.textContent = `${diff} kcal remaining today`;
+        statusEl.className = 'mt-2 text-xs font-semibold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full text-center';
+        const dayIndex = new Date(selectedDate).getDate() % ENCOURAGEMENTS.length;
+        encEl.textContent = ENCOURAGEMENTS[dayIndex];
+      } else {
+        statusEl.textContent = `+${Math.abs(diff)} kcal nourished today — all good! ✨`;
+        statusEl.className = 'mt-2 text-xs font-semibold text-indigo-700 bg-indigo-50 px-3 py-1 rounded-full text-center';
+        encEl.textContent = "Enjoyed a fuller meal or treat today? Awesome! Balance is built over weeks, not one day. ❤️";
+      }
+
+      // Macro bars
+      document.getElementById('dash-protein').textContent = Math.round(totals.pro);
+      document.getElementById('dash-protein-target').textContent = tPro;
+      document.getElementById('bar-protein').style.width = `${Math.min((totals.pro / tPro) * 100, 100)}%`;
+
+      document.getElementById('dash-carbs').textContent = Math.round(totals.carb);
+      document.getElementById('dash-carbs-target').textContent = tCarb;
+      document.getElementById('bar-carbs').style.width = `${Math.min((totals.carb / tCarb) * 100, 100)}%`;
+
+      document.getElementById('dash-fat').textContent = Math.round(totals.fat);
+      document.getElementById('dash-fat-target').textContent = tFat;
+      document.getElementById('bar-fat').style.width = `${Math.min((totals.fat / tFat) * 100, 100)}%`;
+
+      // Quick Wellness Cards
+      const gut = state.gutLogs[selectedDate];
+      if (gut) {
+        document.getElementById('dash-gut-summary').textContent = `${gut.bowel_movement_count} BM • Acid ${gut.acidity_level}/5`;
+        document.getElementById('dash-gut-sub').textContent = `Bloating ${gut.bloating_level}/5${gut.notes ? ' • ' + gut.notes : ''}`;
+      } else {
+        document.getElementById('dash-gut-summary').textContent = 'Not logged';
+        document.getElementById('dash-gut-sub').textContent = 'Tap to check in';
+      }
+
+      const sleep = state.sleepLogs[selectedDate];
+      if (sleep && sleep.duration_hours) {
+        document.getElementById('dash-sleep-summary').textContent = `${sleep.duration_hours} hrs`;
+        document.getElementById('dash-sleep-sub').textContent = '★'.repeat(sleep.quality_rating || 0) + '☆'.repeat(5 - (sleep.quality_rating || 0));
+      } else {
+        document.getElementById('dash-sleep-summary').textContent = '-- hrs';
+        document.getElementById('dash-sleep-sub').textContent = 'Tap to log rest';
+      }
+
+      const act = state.activityLogs[selectedDate];
+      if (act) {
+        document.getElementById('dash-activity-summary').textContent = `${Number(act.steps || 0).toLocaleString()} steps`;
+        document.getElementById('dash-activity-sub').textContent = act.workout_minutes ? `${act.workout_type} • ${act.workout_minutes}m` : 'Keep moving gently';
+      } else {
+        document.getElementById('dash-activity-summary').textContent = '0 steps';
+        document.getElementById('dash-activity-sub').textContent = 'Tap to add moves';
+      }
+
+      const sortedWeights = [...state.weightLogs].sort((a, b) => b.log_date.localeCompare(a.log_date));
+      if (sortedWeights.length > 0) {
+        document.getElementById('dash-weight-summary').textContent = `${sortedWeights[0].weight_kg} kg`;
+      } else {
+        document.getElementById('dash-weight-summary').textContent = '-- kg';
+      }
+      document.getElementById('dash-weight-sub').textContent = `Goal: ${state.profile.target_weight_kg || '--'} kg`;
+    }
+
+    // =========================================================================
+    // 7. RENDERING & LOGIC: FOOD TRACKER
+    // =========================================================================
+    function selectMealType(type) {
+      selectedMealType = type;
+      document.querySelectorAll('.meal-pill').forEach(btn => {
+        const active = btn.dataset.meal === type;
+        btn.className = `meal-pill py-2 px-2 rounded-xl text-xs sm:text-sm font-semibold border transition ${
+          active
+            ? 'bg-emerald-50 border-emerald-300 text-emerald-800 shadow-sm'
+            : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50'
+        }`;
+      });
+    }
+
+    function getAllFoods() {
+      return [...state.customFoods, ...BUILTIN_FOODS];
+    }
+
+    function renderFoodSearchResults() {
+      const query = (document.getElementById('food-search-input').value || '').toLowerCase().trim();
+      const container = document.getElementById('food-search-results');
+      const allFoods = getAllFoods();
+      const filtered = query
+        ? allFoods.filter(f => f.name.toLowerCase().includes(query) || f.serving_size.toLowerCase().includes(query))
+        : allFoods;
+
+      if (filtered.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-6 bg-slate-50 rounded-2xl">
+            <p class="text-sm font-semibold text-slate-600">No foods found for "${query}"</p>
+            <button onclick="openCustomFoodModal()" class="mt-2 text-xs font-bold text-indigo-600 hover:underline">+ Add "${query}" as a custom food</button>
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = filtered.map(food => `
+        <div class="flex items-center justify-between p-3 rounded-2xl bg-slate-50/80 hover:bg-emerald-50/60 border border-slate-100 transition group">
+          <div class="min-w-0 pr-3">
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <p class="font-bold text-sm text-slate-800 truncate">${escapeHtml(food.name)}</p>
+              ${food.is_estimated !== false ? '<span class="text-[10px] font-semibold bg-amber-50 text-amber-700 border border-amber-200 px-1.5 py-0.2 rounded-full">~Est.</span>' : ''}
+            </div>
+            <p class="text-xs text-slate-500 mt-0.5">
+              ${escapeHtml(food.serving_size)} • <strong class="text-slate-700">${food.calories} kcal</strong>
+              <span class="hidden sm:inline text-slate-400"> (P: ${food.protein_g}g • C: ${food.carbs_g}g • F: ${food.fat_g}g)</span>
+            </p>
+          </div>
+          <button onclick='openPortionModal(${JSON.stringify(food).replace(/'/g, "&#39;")})' class="shrink-0 bg-white group-hover:bg-emerald-600 group-hover:text-white text-emerald-700 border border-emerald-200 font-bold text-xs px-3.5 py-2 rounded-xl transition active:scale-95 shadow-xs">
+            + Add
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function openPortionModal(food) {
+      activePortionFood = food;
+      document.getElementById('pm-food-name').textContent = food.name;
+      document.getElementById('pm-serving-size').textContent = `Base serving: ${food.serving_size}`;
+      document.getElementById('pm-custom-qty').value = '1';
+      document.getElementById('pm-meal-type').value = selectedMealType;
+      updatePortionPreview();
+      const modal = document.getElementById('portion-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closePortionModal() {
+      const modal = document.getElementById('portion-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+      activePortionFood = null;
+    }
+
+    function setPortionMultiplier(val) {
+      document.getElementById('pm-custom-qty').value = val;
+      updatePortionPreview();
+    }
+
+    function updatePortionPreview() {
+      if (!activePortionFood) return;
+      const qty = Math.max(0.1, parseFloat(document.getElementById('pm-custom-qty').value) || 1);
+      document.getElementById('pm-preview-cal').textContent = Math.round(activePortionFood.calories * qty);
+      document.getElementById('pm-preview-pro').textContent = `${(activePortionFood.protein_g * qty).toFixed(1)}g`;
+      document.getElementById('pm-preview-carb').textContent = `${(activePortionFood.carbs_g * qty).toFixed(1)}g`;
+      document.getElementById('pm-preview-fat').textContent = `${(activePortionFood.fat_g * qty).toFixed(1)}g`;
+    }
+
+    async function confirmAddFoodLog() {
+      if (!activePortionFood) return;
+      const qty = Math.max(0.1, parseFloat(document.getElementById('pm-custom-qty').value) || 1);
+      const mealType = document.getElementById('pm-meal-type').value;
+
+      const entry = {
+        id: generateLocalId(),
+        log_date: selectedDate,
+        meal_type: mealType,
+        food_name: activePortionFood.name,
+        quantity: qty,
+        calories: Number((activePortionFood.calories * qty).toFixed(1)),
+        protein_g: Number((activePortionFood.protein_g * qty).toFixed(1)),
+        carbs_g: Number((activePortionFood.carbs_g * qty).toFixed(1)),
+        fat_g: Number((activePortionFood.fat_g * qty).toFixed(1)),
+        is_estimated: activePortionFood.is_estimated !== false,
+      };
+
+      state.foodLogs.push(entry);
+      saveLocalState();
+      closePortionModal();
+      renderAll();
+      showToast(`Logged ${entry.food_name} (${Math.round(entry.calories)} kcal ~Est.)`);
+
+      // Push to Supabase if signed in
+      if (sbClient && currentUser) {
+        try {
+          const { data, error } = await sbClient.from('food_logs').insert({
+            user_id: currentUser.id,
+            log_date: entry.log_date,
+            meal_type: entry.meal_type,
+            food_name: entry.food_name,
+            quantity: entry.quantity,
+            calories: entry.calories,
+            protein_g: entry.protein_g,
+            carbs_g: entry.carbs_g,
+            fat_g: entry.fat_g,
+            is_estimated: entry.is_estimated,
+          }).select().single();
+          if (!error && data) {
+            entry.id = data.id;
+            saveLocalState();
+          }
+        } catch (e) {
+          console.warn('Cloud food log sync deferred:', e);
+        }
+      }
+    }
+
+    async function deleteFoodLog(id) {
+      state.foodLogs = state.foodLogs.filter(l => l.id !== id);
+      saveLocalState();
+      renderAll();
+      showToast('Removed food item', 'info');
+
+      if (sbClient && currentUser && !id.startsWith('loc_')) {
+        try {
+          await sbClient.from('food_logs').delete().eq('id', id).eq('user_id', currentUser.id);
+        } catch (e) {
+          console.warn('Cloud delete skipped:', e);
+        }
+      }
+    }
+
+    function renderLoggedMeals() {
+      const dayLogs = state.foodLogs.filter(l => l.log_date === selectedDate);
+      const totalCals = dayLogs.reduce((sum, i) => sum + (Number(i.calories) || 0), 0);
+      document.getElementById('food-total-badge').textContent = `${Math.round(totalCals)} kcal ~Est.`;
+
+      const groups = [
+        { key: 'breakfast', label: '🍳 Breakfast' },
+        { key: 'lunch', label: '🍛 Lunch' },
+        { key: 'dinner', label: '🍲 Dinner' },
+        { key: 'snack', label: '🍰 Snacks & Treats' },
+      ];
+
+      const container = document.getElementById('logged-meals-container');
+      if (dayLogs.length === 0) {
+        container.innerHTML = `<p class="text-sm text-slate-400 text-center py-6">No meals logged for this day yet. Pick a food above to start! 🥗</p>`;
+        return;
+      }
+
+      container.innerHTML = groups.map(g => {
+        const items = dayLogs.filter(l => l.meal_type === g.key);
+        if (items.length === 0) return '';
+        const groupCal = Math.round(items.reduce((s, i) => s + Number(i.calories), 0));
+        return `
+          <div class="border border-slate-100 rounded-2xl p-3.5 bg-slate-50/50">
+            <div class="flex items-center justify-between mb-2.5">
+              <h4 class="font-bold text-sm text-slate-800">${g.label}</h4>
+              <span class="text-xs font-bold text-slate-500">${groupCal} kcal ~Est.</span>
+            </div>
+            <div class="space-y-2">
+              ${items.map(item => `
+                <div class="flex items-center justify-between bg-white p-3 rounded-xl border border-slate-100">
+                  <div class="min-w-0 pr-2">
+                    <div class="flex items-center gap-1.5 flex-wrap">
+                      <p class="font-semibold text-sm text-slate-800 truncate">${escapeHtml(item.food_name)}</p>
+                      <span class="text-[11px] font-bold text-slate-400">×${item.quantity}</span>
+                      ${item.is_estimated !== false ? '<span class="text-[9px] font-semibold bg-amber-50 text-amber-700 px-1.5 py-0.2 rounded-full">~Est.</span>' : ''}
+                    </div>
+                    <p class="text-xs text-slate-500 mt-0.5">
+                      <strong>${Math.round(item.calories)} kcal</strong> • P ${Math.round(item.protein_g)}g • C ${Math.round(item.carbs_g)}g • F ${Math.round(item.fat_g)}g
+                    </p>
+                  </div>
+                  <button onclick="deleteFoodLog('${item.id}')" class="p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition" aria-label="Delete item">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                  </button>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Custom Food Modal
+    function openCustomFoodModal() {
+      const searchVal = document.getElementById('food-search-input').value.trim();
+      if (searchVal) document.getElementById('cf-name').value = searchVal;
+      const modal = document.getElementById('custom-food-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeCustomFoodModal() {
+      const modal = document.getElementById('custom-food-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    async function saveCustomFood() {
+      const name = document.getElementById('cf-name').value.trim();
+      const serving = document.getElementById('cf-serving').value.trim() || '1 serving';
+      const calories = parseFloat(document.getElementById('cf-cal').value) || 0;
+      const protein_g = parseFloat(document.getElementById('cf-pro').value) || 0;
+      const carbs_g = parseFloat(document.getElementById('cf-carb').value) || 0;
+      const fat_g = parseFloat(document.getElementById('cf-fat').value) || 0;
+
+      if (!name) {
+        showToast('Please enter a food name', 'warn');
+        return;
+      }
+
+      const newFood = {
+        id: generateLocalId(),
+        name,
+        serving_size: serving,
+        calories,
+        protein_g,
+        carbs_g,
+        fat_g,
+        is_estimated: true,
+      };
+
+      state.customFoods.unshift(newFood);
+      saveLocalState();
+      closeCustomFoodModal();
+      ['cf-name', 'cf-serving', 'cf-cal', 'cf-pro', 'cf-carb', 'cf-fat'].forEach(id => document.getElementById(id).value = '');
+      renderFoodSearchResults();
+      showToast(`Saved "${name}" to your food database!`);
+
+      if (sbClient && currentUser) {
+        try {
+          await sbClient.from('foods').insert({
+            user_id: currentUser.id,
+            name: newFood.name,
+            serving_size: newFood.serving_size,
+            calories: newFood.calories,
+            protein_g: newFood.protein_g,
+            carbs_g: newFood.carbs_g,
+            fat_g: newFood.fat_g,
+            is_estimated: true,
+          });
+        } catch (e) {
+          console.warn('Cloud custom food sync error:', e);
+        }
+      }
+    }
+
+    // =========================================================================
+    // 8. RENDERING & LOGIC: WELLNESS TRACKER (GUT, SLEEP, ACTIVITY)
+    // =========================================================================
+    function renderWellnessTrackers() {
+      // Load Gut
+      const gut = state.gutLogs[selectedDate] || { bowel_movement_count: 0, acidity_level: 0, bloating_level: 0, notes: '' };
+      gutDraft = { ...gut };
+      document.getElementById('gut-bm-count').textContent = gutDraft.bowel_movement_count;
+      document.getElementById('gut-notes').value = gutDraft.notes || '';
+      renderGutScales();
+
+      // Load Sleep
+      const sleep = state.sleepLogs[selectedDate] || { sleep_time: '23:00', wake_time: '07:00', duration_hours: 8.0, quality_rating: 4 };
+      document.getElementById('sleep-bedtime').value = extractTimeHHMM(sleep.sleep_time) || '23:00';
+      document.getElementById('sleep-waketime').value = extractTimeHHMM(sleep.wake_time) || '07:00';
+      sleepQualityDraft = sleep.quality_rating || 4;
+      calculateSleepDuration();
+      renderSleepStars();
+
+      // Load Activity
+      const act = state.activityLogs[selectedDate] || { steps: 0, workout_type: 'Walking', workout_minutes: 0, calories_burned: 0 };
+      document.getElementById('activity-steps').value = act.steps || '';
+      document.getElementById('activity-workout-type').value = act.workout_type || 'Walking';
+      document.getElementById('activity-minutes').value = act.workout_minutes || '';
+      document.getElementById('activity-burned').value = act.calories_burned || '';
+    }
+
+    function adjustBowel(delta) {
+      gutDraft.bowel_movement_count = Math.max(0, (gutDraft.bowel_movement_count || 0) + delta);
+      document.getElementById('gut-bm-count').textContent = gutDraft.bowel_movement_count;
+    }
+
+    function renderGutScales() {
+      const emojis = ['😌', '🙂', '😐', '😕', '😣', '🔥'];
+      const bloatEmojis = ['😌', '🙂', '🫧', '🎈', '😣', '😫'];
+
+      document.getElementById('gut-acidity-label').textContent = `${gutDraft.acidity_level} / 5`;
+      document.getElementById('acidity-scale').innerHTML = [0, 1, 2, 3, 4, 5].map(n => `
+        <button onclick="setGutLevel('acidity', ${n})" class="py-2 rounded-xl border text-center transition active:scale-95 ${
+          gutDraft.acidity_level === n
+            ? 'bg-amber-100 border-amber-400 text-amber-900 font-extrabold shadow-xs'
+            : 'bg-slate-50 border-slate-200 text-slate-600'
+        }">
+          <div class="text-base leading-none">${emojis[n]}</div>
+          <div class="text-[10px] mt-1 font-bold">${n}</div>
+        </button>
+      `).join('');
+
+      document.getElementById('gut-bloating-label').textContent = `${gutDraft.bloating_level} / 5`;
+      document.getElementById('bloating-scale').innerHTML = [0, 1, 2, 3, 4, 5].map(n => `
+        <button onclick="setGutLevel('bloating', ${n})" class="py-2 rounded-xl border text-center transition active:scale-95 ${
+          gutDraft.bloating_level === n
+            ? 'bg-rose-100 border-rose-400 text-rose-900 font-extrabold shadow-xs'
+            : 'bg-slate-50 border-slate-200 text-slate-600'
+        }">
+          <div class="text-base leading-none">${bloatEmojis[n]}</div>
+          <div class="text-[10px] mt-1 font-bold">${n}</div>
+        </button>
+      `).join('');
+    }
+
+    function setGutLevel(field, val) {
+      if (field === 'acidity') gutDraft.acidity_level = val;
+      if (field === 'bloating') gutDraft.bloating_level = val;
+      renderGutScales();
+    }
+
+    async function saveGutLog() {
+      const entry = {
+        id: (state.gutLogs[selectedDate] && state.gutLogs[selectedDate].id) || generateLocalId(),
+        log_date: selectedDate,
+        bowel_movement_count: gutDraft.bowel_movement_count,
+        acidity_level: gutDraft.acidity_level,
+        bloating_level: gutDraft.bloating_level,
+        notes: document.getElementById('gut-notes').value.trim(),
+      };
+      state.gutLogs[selectedDate] = entry;
+      saveLocalState();
+      renderDashboard();
+      showToast('Gut health check-in saved! 🌿');
+
+      if (sbClient && currentUser) {
+        try {
+          await sbClient.from('gut_logs').delete().eq('user_id', currentUser.id).eq('log_date', selectedDate);
+          await sbClient.from('gut_logs').insert({
+            user_id: currentUser.id,
+            log_date: entry.log_date,
+            bowel_movement_count: entry.bowel_movement_count,
+            acidity_level: entry.acidity_level,
+            bloating_level: entry.bloating_level,
+            notes: entry.notes,
+          });
+        } catch (e) {
+          console.warn('Cloud gut sync deferred:', e);
+        }
+      }
+    }
+
+    // Sleep helpers
+    function extractTimeHHMM(val) {
+      if (!val) return '';
+      if (val.length === 5 && val.includes(':')) return val;
+      const d = new Date(val);
+      if (isNaN(d.getTime())) return '';
+      return d.toTimeString().slice(0, 5);
+    }
+
+    function calculateSleepDuration() {
+      const bed = document.getElementById('sleep-bedtime').value;
+      const wake = document.getElementById('sleep-waketime').value;
+      if (!bed || !wake) return 0;
+      const [bh, bm] = bed.split(':').map(Number);
+      const [wh, wm] = wake.split(':').map(Number);
+      let mins = (wh * 60 + wm) - (bh * 60 + bm);
+      if (mins <= 0) mins += 24 * 60;
+      const hrs = Number((mins / 60).toFixed(1));
+      document.getElementById('sleep-duration-display').textContent = `${hrs} hrs`;
+      return hrs;
+    }
+
+    function renderSleepStars() {
+      document.getElementById('sleep-stars').innerHTML = [1, 2, 3, 4, 5].map(n => `
+        <button onclick="setSleepQuality(${n})" class="flex-1 py-2.5 rounded-xl border text-lg transition active:scale-95 ${
+          n <= sleepQualityDraft
+            ? 'bg-indigo-50 border-indigo-300 text-indigo-600'
+            : 'bg-slate-50 border-slate-200 text-slate-300'
+        }">★</button>
+      `).join('');
+    }
+
+    function setSleepQuality(n) {
+      sleepQualityDraft = n;
+      renderSleepStars();
+    }
+
+    async function saveSleepLog() {
+      const bed = document.getElementById('sleep-bedtime').value || '23:00';
+      const wake = document.getElementById('sleep-waketime').value || '07:00';
+      const duration = calculateSleepDuration();
+
+      // Convert to ISO timestamps for Supabase timestamptz columns
+      const sleepIso = new Date(`${selectedDate}T${bed}:00`).toISOString();
+      const wakeIso = new Date(`${selectedDate}T${wake}:00`).toISOString();
+
+      const entry = {
+        id: (state.sleepLogs[selectedDate] && state.sleepLogs[selectedDate].id) || generateLocalId(),
+        log_date: selectedDate,
+        sleep_time: bed,
+        wake_time: wake,
+        duration_hours: duration,
+        quality_rating: sleepQualityDraft,
+      };
+
+      state.sleepLogs[selectedDate] = entry;
+      saveLocalState();
+      renderDashboard();
+      showToast(`Sleep logged (${duration} hrs)! 🌙`);
+
+      if (sbClient && currentUser) {
+        try {
+          await sbClient.from('sleep_logs').delete().eq('user_id', currentUser.id).eq('log_date', selectedDate);
+          await sbClient.from('sleep_logs').insert({
+            user_id: currentUser.id,
+            log_date: selectedDate,
+            sleep_time: sleepIso,
+            wake_time: wakeIso,
+            duration_hours: duration,
+            quality_rating: sleepQualityDraft,
+          });
+        } catch (e) {
+          console.warn('Cloud sleep sync deferred:', e);
+        }
+      }
+    }
+
+    // Activity helpers
+    function addSteps(amount) {
+      const el = document.getElementById('activity-steps');
+      el.value = (parseInt(el.value, 10) || 0) + amount;
+    }
+
+    function autoEstimateBurn() {
+      const mins = parseInt(document.getElementById('activity-minutes').value, 10) || 0;
+      const type = document.getElementById('activity-workout-type').value;
+      const rateMap = { 'Walking': 4.5, 'Gym / Strength': 6, 'Yoga / Stretching': 3.5, 'Running / Jogging': 9.5, 'Cycling': 7.5, 'Sports / Badminton': 7, 'Rest Day': 0 };
+      const est = Math.round(mins * (rateMap[type] || 5));
+      document.getElementById('activity-burned').value = est;
+    }
+
+    async function saveActivityLog() {
+      const steps = parseInt(document.getElementById('activity-steps').value, 10) || 0;
+      const workout_type = document.getElementById('activity-workout-type').value;
+      const workout_minutes = parseInt(document.getElementById('activity-minutes').value, 10) || 0;
+      const calories_burned = parseInt(document.getElementById('activity-burned').value, 10) || 0;
+
+      const entry = {
+        id: (state.activityLogs[selectedDate] && state.activityLogs[selectedDate].id) || generateLocalId(),
+        log_date: selectedDate,
+        steps,
+        workout_type,
+        workout_minutes,
+        calories_burned,
+      };
+
+      state.activityLogs[selectedDate] = entry;
+      saveLocalState();
+      renderDashboard();
+      showToast(`Activity saved (${steps.toLocaleString()} steps)! 👟`);
+
+      if (sbClient && currentUser) {
+        try {
+          await sbClient.from('activity_logs').delete().eq('user_id', currentUser.id).eq('log_date', selectedDate);
+          await sbClient.from('activity_logs').insert({
+            user_id: currentUser.id,
+            log_date: selectedDate,
+            steps,
+            workout_type,
+            workout_minutes,
+            calories_burned,
+          });
+        } catch (e) {
+          console.warn('Cloud activity sync deferred:', e);
+        }
+      }
+    }
+
+    // =========================================================================
+    // 9. RENDERING & LOGIC: MEAL PLANNER & REPORTS
+    // =========================================================================
+    function renderPlanAndReports() {
+      renderPlannerDays();
+      renderPlannerMeals();
+      renderCharts();
+    }
+
+    function renderPlannerDays() {
+      document.getElementById('planner-active-day-label').textContent = selectedPlannerDay;
+      document.getElementById('planner-days-tabs').innerHTML = DAYS_OF_WEEK.map(day => `
+        <button onclick="selectPlannerDay('${day}')" class="px-4 py-2 rounded-xl text-xs font-bold transition shrink-0 ${
+          selectedPlannerDay === day
+            ? 'bg-indigo-600 text-white shadow-sm'
+            : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+        }">${day}</button>
+      `).join('');
+    }
+
+    function selectPlannerDay(day) {
+      selectedPlannerDay = day;
+      renderPlannerDays();
+      renderPlannerMeals();
+    }
+
+    function renderPlannerMeals() {
+      const dayPlans = state.mealPlans.filter(p => p.day_of_week === selectedPlannerDay);
+      const container = document.getElementById('planner-meals-list');
+
+      if (dayPlans.length === 0) {
+        container.innerHTML = `<p class="text-xs text-slate-400 text-center py-5 bg-slate-50 rounded-2xl">No meals planned for ${selectedPlannerDay} yet. Add your first idea below!</p>`;
+        return;
+      }
+
+      const icons = { breakfast: '🍳', lunch: '🍛', dinner: '🍲', snack: '🍰' };
+      container.innerHTML = dayPlans.map(p => `
+        <div class="flex items-center justify-between p-3.5 bg-slate-50 rounded-2xl border border-slate-100">
+          <div>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-full">
+              ${icons[p.meal_type] || ''} ${p.meal_type}
+            </span>
+            <p class="font-bold text-sm text-slate-800 mt-1">${escapeHtml(p.planned_meal)}</p>
+            ${p.est_calories ? `<p class="text-xs text-slate-500">~${p.est_calories} kcal Est.</p>` : ''}
+          </div>
+          <button onclick="deleteMealPlan('${p.id}')" class="p-2 text-slate-400 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition">✕</button>
+        </div>
+      `).join('');
+    }
+
+    async function addMealPlan() {
+      const meal_type = document.getElementById('plan-meal-type').value;
+      const planned_meal = document.getElementById('plan-meal-text').value.trim();
+      const est_calories = parseInt(document.getElementById('plan-meal-cals').value, 10) || null;
+
+      if (!planned_meal) {
+        showToast('Enter a meal idea first!', 'warn');
+        return;
+      }
+
+      const entry = {
+        id: generateLocalId(),
+        day_of_week: selectedPlannerDay,
+        meal_type,
+        planned_meal,
+        est_calories,
+      };
+
+      state.mealPlans.push(entry);
+      saveLocalState();
+      document.getElementById('plan-meal-text').value = '';
+      document.getElementById('plan-meal-cals').value = '';
+      renderPlannerMeals();
+      showToast(`Added to ${selectedPlannerDay}'s meal plan!`);
+
+      if (sbClient && currentUser) {
+        try {
+          const { data, error } = await sbClient.from('meal_plans').insert({
+            user_id: currentUser.id,
+            day_of_week: entry.day_of_week,
+            meal_type: entry.meal_type,
+            planned_meal: entry.planned_meal,
+            est_calories: entry.est_calories,
+          }).select().single();
+          if (!error && data) {
+            entry.id = data.id;
+            saveLocalState();
+          }
+        } catch (e) {
+          console.warn('Cloud meal plan sync deferred:', e);
+        }
+      }
+    }
+
+    async function deleteMealPlan(id) {
+      state.mealPlans = state.mealPlans.filter(p => p.id !== id);
+      saveLocalState();
+      renderPlannerMeals();
+      if (sbClient && currentUser && !id.startsWith('loc_')) {
+        try {
+          await sbClient.from('meal_plans').delete().eq('id', id).eq('user_id', currentUser.id);
+        } catch (e) {}
+      }
+    }
+
+    async function logWeight() {
+      const val = parseFloat(document.getElementById('weight-input').value);
+      if (!val || val < 20 || val > 300) {
+        showToast('Please enter a valid weight in kg', 'warn');
+        return;
+      }
+      const today = getTodayStr();
+      // Replace existing entry for today if present
+      state.weightLogs = state.weightLogs.filter(w => w.log_date !== today);
+      state.weightLogs.push({ id: generateLocalId(), log_date: today, weight_kg: val });
+      saveLocalState();
+      document.getElementById('weight-input').value = '';
+      renderAll();
+      showToast(`Weight logged: ${val} kg ⚖️`);
+
+      if (sbClient && currentUser) {
+        try {
+          await sbClient.from('weight_logs').delete().eq('user_id', currentUser.id).eq('log_date', today);
+          await sbClient.from('weight_logs').insert({
+            user_id: currentUser.id,
+            log_date: today,
+            weight_kg: val,
+          });
+        } catch (e) {
+          console.warn('Cloud weight sync deferred:', e);
+        }
+      }
+    }
+
+    function renderCharts() {
+      document.getElementById('chart-cal-target-lbl').textContent = state.profile.target_calories || 2000;
+      document.getElementById('chart-wt-target-lbl').textContent = state.profile.target_weight_kg || '--';
+
+      // Build last 7 days labels & calorie sums
+      const labels7 = [];
+      const cals7 = [];
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const offset = d.getTimezoneOffset();
+        const iso = new Date(d.getTime() - offset * 60000).toISOString().split('T')[0];
+        labels7.push(d.toLocaleDateString('en-IN', { weekday: 'short' }));
+        const sum = state.foodLogs
+          .filter(l => l.log_date === iso)
+          .reduce((acc, item) => acc + (Number(item.calories) || 0), 0);
+        cals7.push(Math.round(sum));
+      }
+
+      const calCtx = document.getElementById('calorieChart').getContext('2d');
+      if (calorieChartInstance) calorieChartInstance.destroy();
+      calorieChartInstance = new Chart(calCtx, {
+        type: 'bar',
+        data: {
+          labels: labels7,
+          datasets: [{
+            label: 'Calories (~Est.)',
+            data: cals7,
+            backgroundColor: '#10B981',
+            borderRadius: 8,
+            maxBarThickness: 28,
+          }],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true, grid: { color: '#F1F5F9' }, ticks: { font: { size: 10 } } },
+            x: { grid: { display: false }, ticks: { font: { size: 11 } } },
+          },
+        },
+      });
+
+      // Weight Chart
+      const sortedW = [...state.weightLogs].sort((a, b) => a.log_date.localeCompare(b.log_date)).slice(-10);
+      const wLabels = sortedW.length ? sortedW.map(w => w.log_date.slice(5)) : ['Today'];
+      const wData = sortedW.length ? sortedW.map(w => w.weight_kg) : [null];
+
+      const wtCtx = document.getElementById('weightChart').getContext('2d');
+      if (weightChartInstance) weightChartInstance.destroy();
+      weightChartInstance = new Chart(wtCtx, {
+        type: 'line',
+        data: {
+          labels: wLabels,
+          datasets: [{
+            label: 'Weight (kg)',
+            data: wData,
+            borderColor: '#F43F5E',
+            backgroundColor: 'rgba(244, 63, 94, 0.1)',
+            fill: true,
+            tension: 0.35,
+            pointRadius: 4,
+            pointBackgroundColor: '#F43F5E',
+          }],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { grid: { color: '#F1F5F9' }, ticks: { font: { size: 10 } } },
+            x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+          },
+        },
+      });
+    }
+
+    // =========================================================================
+    // 10. SETTINGS & SUPABASE CLOUD SYNC
+    // =========================================================================
+    function renderSettings() {
+      document.getElementById('set-name').value = state.profile.full_name || '';
+      document.getElementById('set-calories').value = state.profile.target_calories || 2000;
+      document.getElementById('set-protein').value = state.profile.target_protein_g || 120;
+      document.getElementById('set-carbs').value = state.profile.target_carbs_g || 220;
+      document.getElementById('set-fat').value = state.profile.target_fat_g || 65;
+      document.getElementById('set-weight').value = state.profile.target_weight_kg || '';
+
+      try {
+        const cfg = JSON.parse(localStorage.getItem(SB_CONFIG_KEY) || '{}');
+        if (cfg.url) document.getElementById('sb-url').value = cfg.url;
+        if (cfg.key) document.getElementById('sb-key').value = cfg.key;
+      } catch (e) {}
+
+      updateSyncBadges();
+    }
+
+    async function saveTargets() {
+      state.profile = {
+        full_name: document.getElementById('set-name').value.trim() || 'Friend',
+        target_calories: parseInt(document.getElementById('set-calories').value, 10) || 2000,
+        target_protein_g: parseInt(document.getElementById('set-protein').value, 10) || 120,
+        target_carbs_g: parseInt(document.getElementById('set-carbs').value, 10) || 220,
+        target_fat_g: parseInt(document.getElementById('set-fat').value, 10) || 65,
+        target_weight_kg: parseFloat(document.getElementById('set-weight').value) || null,
+      };
+      saveLocalState();
+      renderDashboard();
+      showToast('Personalised targets updated! 🎯');
+
+      if (sbClient && currentUser) {
+        try {
+          await sbClient.from('profiles').upsert({
+            id: currentUser.id,
+            ...state.profile,
+          });
+        } catch (e) {
+          console.warn('Cloud profile sync error:', e);
+        }
+      }
+    }
+
+    function initSupabaseFromStorage() {
+      try {
+        const cfg = JSON.parse(localStorage.getItem(SB_CONFIG_KEY) || '{}');
+        if (cfg.url && cfg.key && window.supabase) {
+          sbClient = window.supabase.createClient(cfg.url, cfg.key);
+          checkSupabaseSession();
+        }
+      } catch (e) {
+        console.warn('Could not initialize Supabase:', e);
+      }
+    }
+
+    function saveSupabaseConfig() {
+      const url = document.getElementById('sb-url').value.trim();
+      const key = document.getElementById('sb-key').value.trim();
+      if (!url || !key) {
+        showToast('Please paste both your Project URL and Anon Key', 'warn');
+        return;
+      }
+      localStorage.setItem(SB_CONFIG_KEY, JSON.stringify({ url, key }));
+      try {
+        sbClient = window.supabase.createClient(url, key);
+        showToast('Supabase connected! Now sign in or sign up below.', 'info');
+        checkSupabaseSession();
+      } catch (e) {
+        showToast('Invalid Supabase URL or Key format', 'warn');
+      }
+    }
+
+    async function checkSupabaseSession() {
+      if (!sbClient) return;
+      try {
+        const { data: { session } } = await sbClient.auth.getSession();
+        currentUser = session ? session.user : null;
+        updateSyncBadges();
+        if (currentUser) {
+          await syncAllWithSupabase();
+        }
+      } catch (e) {
+        console.warn('Session check failed (offline?):', e);
+      }
+    }
+
+    async function handleSignUp() {
+      if (!sbClient) {
+        showToast('First save your Supabase Project URL & Anon Key above', 'warn');
+        return;
+      }
+      const email = document.getElementById('auth-email').value.trim();
+      const password = document.getElementById('auth-password').value;
+      if (!email || password.length < 6) {
+        showToast('Enter a valid email and 6+ character password', 'warn');
+        return;
+      }
+      try {
+        const { data, error } = await sbClient.auth.signUp({ email, password });
+        if (error) throw error;
+        if (data.session) {
+          currentUser = data.user;
+          updateSyncBadges();
+          await syncAllWithSupabase();
+          showToast('Account created & synced! 🎉');
+        } else {
+          showToast('Sign-up successful! Check your email to confirm, then Sign In.', 'info');
+        }
+      } catch (e) {
+        showToast(e.message || 'Sign-up failed', 'warn');
+      }
+    }
+
+    async function handleSignIn() {
+      if (!sbClient) {
+        showToast('First save your Supabase Project URL & Anon Key above', 'warn');
+        return;
+      }
+      const email = document.getElementById('auth-email').value.trim();
+      const password = document.getElementById('auth-password').value;
+      if (!email || !password) {
+        showToast('Please enter email and password', 'warn');
+        return;
+      }
+      try {
+        const { data, error } = await sbClient.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        currentUser = data.user;
+        updateSyncBadges();
+        await syncAllWithSupabase();
+        showToast('Welcome back! Cloud sync active ☁️');
+      } catch (e) {
+        showToast(e.message || 'Sign-in failed', 'warn');
+      }
+    }
+
+    async function handleSignOut() {
+      if (sbClient) {
+        try { await sbClient.auth.signOut(); } catch (e) {}
+      }
+      currentUser = null;
+      updateSyncBadges();
+      showToast('Signed out. Local data is still safe on this device.', 'info');
+    }
+
+    async function syncAllWithSupabase() {
+      if (!sbClient || !currentUser) return;
+      try {
+        const uid = currentUser.id;
+
+        // 1. Profile
+        const { data: prof } = await sbClient.from('profiles').select('*').eq('id', uid).maybeSingle();
+        if (prof) {
+          state.profile = {
+            full_name: prof.full_name || state.profile.full_name,
+            target_calories: prof.target_calories || 2000,
+            target_protein_g: prof.target_protein_g || 120,
+            target_carbs_g: prof.target_carbs_g || 220,
+            target_fat_g: prof.target_fat_g || 65,
+            target_weight_kg: prof.target_weight_kg,
+          };
+        } else {
+          await sbClient.from('profiles').upsert({ id: uid, ...state.profile });
+        }
+
+        // 2. Pull Cloud Tables in parallel
+        const [foodsRes, foodLogsRes, mealPlansRes, gutRes, sleepRes, actRes, weightRes] = await Promise.all([
+          sbClient.from('foods').select('*').eq('user_id', uid),
+          sbClient.from('food_logs').select('*').eq('user_id', uid),
+          sbClient.from('meal_plans').select('*').eq('user_id', uid),
+          sbClient.from('gut_logs').select('*').eq('user_id', uid),
+          sbClient.from('sleep_logs').select('*').eq('user_id', uid),
+          sbClient.from('activity_logs').select('*').eq('user_id', uid),
+          sbClient.from('weight_logs').select('*').eq('user_id', uid),
+        ]);
+
+        if (foodsRes.data && foodsRes.data.length) state.customFoods = foodsRes.data;
+        if (foodLogsRes.data && foodLogsRes.data.length) state.foodLogs = foodLogsRes.data;
+        if (mealPlansRes.data && mealPlansRes.data.length) state.mealPlans = mealPlansRes.data;
+        if (weightRes.data && weightRes.data.length) state.weightLogs = weightRes.data;
+
+        if (gutRes.data) {
+          gutRes.data.forEach(g => { state.gutLogs[g.log_date] = g; });
+        }
+        if (sleepRes.data) {
+          sleepRes.data.forEach(s => { state.sleepLogs[s.log_date] = s; });
+        }
+        if (actRes.data) {
+          actRes.data.forEach(a => { state.activityLogs[a.log_date] = a; });
+        }
+
+        saveLocalState();
+        renderAll();
+      } catch (e) {
+        console.warn('Sync encountered an issue:', e);
+        showToast('Could not reach cloud right now—using local mode', 'warn');
+      }
+    }
+
+    function updateSyncBadges() {
+      const sbBadge = document.getElementById('sidebar-sync-badge');
+      const mobBadge = document.getElementById('mobile-sync-badge');
+      const setBadge = document.getElementById('settings-sync-status');
+      const loggedOutView = document.getElementById('sb-logged-out-view');
+      const loggedInView = document.getElementById('sb-logged-in-view');
+
+      if (currentUser) {
+        sbBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-500"></span> Cloud Synced';
+        sbBadge.className = 'inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800';
+        mobBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-emerald-500"></span> Synced';
+        setBadge.textContent = 'Cloud Active';
+        setBadge.className = 'text-xs font-bold px-3 py-1 rounded-full bg-emerald-100 text-emerald-800';
+        loggedOutView.classList.add('hidden');
+        loggedInView.classList.remove('hidden');
+        document.getElementById('auth-user-email').textContent = currentUser.email;
+      } else {
+        sbBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-500"></span> Local Only';
+        sbBadge.className = 'inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800';
+        mobBadge.innerHTML = '<span class="w-2 h-2 rounded-full bg-amber-400"></span> Local';
+        setBadge.textContent = sbClient ? 'Ready to Sign In' : 'Local Only';
+        setBadge.className = 'text-xs font-bold px-3 py-1 rounded-full bg-amber-100 text-amber-800';
+        loggedOutView.classList.remove('hidden');
+        loggedInView.classList.add('hidden');
+      }
+    }
+
+    function escapeHtml(str) {
+      return String(str || '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+    }
+
+    // =========================================================================
+    // 11. MASTER RENDER & INITIALIZATION
+    // =========================================================================
+    function renderAll() {
+      const dInfo = formatDisplayDate(selectedDate);
+      document.getElementById('current-date-label').textContent = dInfo.main;
+      document.getElementById('current-date-sub').textContent = dInfo.sub;
+
+      if (activeTab === 'dashboard') renderDashboard();
+      if (activeTab === 'food') {
+        selectMealType(selectedMealType);
+        renderFoodSearchResults();
+        renderLoggedMeals();
+      }
+      if (activeTab === 'track') renderWellnessTrackers();
+      if (activeTab === 'plan') renderPlanAndReports();
+      if (activeTab === 'settings') renderSettings();
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadLocalState();
+      initSupabaseFromStorage();
+      switchTab('dashboard');
+    });
+  </script>
+</body>
+</html>
