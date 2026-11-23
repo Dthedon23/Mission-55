@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Mission 55 — Friendly Health & Nutrition</title>
+  <title>Mission 55 — Strict Accountability Health & Nutrition</title>
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Chart.js CDN for 7-Day Calorie & Weight Trends -->
+  <!-- Chart.js CDN for 7-Day Calorie, Steps & Weight Trends -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
   <!-- Supabase JS v2 CDN for Cloud Sync & Auth -->
@@ -47,7 +47,6 @@
       background-color: #FAF9F6;
       -webkit-tap-highlight-color: transparent;
     }
-    /* Smooth custom scrollbar */
     ::-webkit-scrollbar {
       width: 6px;
       height: 6px;
@@ -66,13 +65,11 @@
       -ms-overflow-style: none;
       scrollbar-width: none;
     }
-    /* Progress ring animation */
     .progress-ring-circle {
       transition: stroke-dashoffset 0.6s cubic-bezier(0.4, 0, 0.2, 1);
       transform: rotate(-90deg);
       transform-origin: 50% 50%;
     }
-    /* Fade transition for views */
     .view-section {
       animation: fadeIn 0.2s ease-out;
     }
@@ -89,12 +86,12 @@
     <div>
       <!-- Brand Header -->
       <div class="flex items-center gap-3 mb-8">
-        <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-emerald-400 via-teal-500 to-indigo-500 flex items-center justify-center text-white font-extrabold text-lg shadow-md shadow-emerald-200">
-          61
+        <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-rose-600 via-slate-900 to-emerald-600 flex items-center justify-center text-white font-extrabold text-lg shadow-md">
+          55
         </div>
         <div>
           <h1 class="font-extrabold text-xl tracking-tight text-slate-900">Mission 55</h1>
-          <p class="text-xs text-slate-500 font-medium">Kind, steady health ✨</p>
+          <p class="text-xs text-rose-600 font-bold">Zero excuses. Real results. 🔥</p>
         </div>
       </div>
 
@@ -119,15 +116,15 @@
     </div>
 
     <!-- Sidebar Cloud Status Footer -->
-    <div class="bg-slate-50 rounded-2xl p-4 border border-slate-100">
+    <div class="bg-slate-900 text-white rounded-2xl p-4 border border-slate-800">
       <div class="flex items-center justify-between mb-1.5">
-        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">Storage</span>
+        <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Storage</span>
         <span id="sidebar-sync-badge" class="inline-flex items-center gap-1.5 text-xs font-semibold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800">
           <span class="w-2 h-2 rounded-full bg-amber-500"></span> Local Only
         </span>
       </div>
-      <p class="text-xs text-slate-500 leading-relaxed">
-        No guilt, just awareness. Treats like Subway & tiramisu are always welcome here. 🍰
+      <p class="text-xs text-slate-300 leading-relaxed">
+        Scale jhooth nahi bolta. Daily steps aur calories dono track kar — bahane band!
       </p>
     </div>
   </aside>
@@ -138,12 +135,12 @@
     <!-- Mobile Top Header -->
     <header class="flex md:hidden items-center justify-between mb-5">
       <div class="flex items-center gap-2.5">
-        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-400 via-teal-500 to-indigo-500 flex items-center justify-center text-white font-extrabold text-sm shadow-sm">
-          61
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-rose-600 via-slate-900 to-emerald-600 flex items-center justify-center text-white font-extrabold text-sm shadow-sm">
+          55
         </div>
         <div>
           <h1 class="font-extrabold text-lg leading-tight text-slate-900">Mission 55</h1>
-          <p class="text-[11px] text-slate-500 font-medium">Health without guilt ✨</p>
+          <p class="text-[11px] text-rose-600 font-bold">No excuses mode 🔥</p>
         </div>
       </div>
       <button onclick="switchTab('settings')" id="mobile-sync-badge" class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-white border border-slate-200 text-slate-600 shadow-sm">
@@ -172,15 +169,80 @@
     <!-- ========================================================= -->
     <section id="view-dashboard" class="view-section space-y-6">
 
-      <!-- Greeting & Supportive Daily Banner -->
-      <div class="rounded-3xl bg-gradient-to-r from-indigo-500 via-purple-500 to-rose-400 p-5 sm:p-6 text-white shadow-lg shadow-indigo-100 relative overflow-hidden">
+      <!-- BLUNT ACCOUNTABILITY HEADER BANNER -->
+      <div id="dash-banner-box" class="rounded-3xl bg-gradient-to-r from-slate-900 via-rose-900 to-slate-900 p-5 sm:p-6 text-white shadow-lg relative overflow-hidden">
         <div class="relative z-10">
-          <h2 id="dash-greeting" class="text-xl sm:text-2xl font-extrabold tracking-tight mb-1">Good evening, Friend! 👋</h2>
-          <p id="dash-encouragement" class="text-white/90 text-sm sm:text-base font-medium max-w-xl">
-            Balance is built over weeks, not one meal. Every small check-in counts!
+          <div class="flex items-center justify-between gap-2 mb-1">
+            <h2 id="dash-greeting" class="text-xl sm:text-2xl font-extrabold tracking-tight">Sun le, Friend! 🎯</h2>
+            <span id="dash-grade-badge" class="text-xs font-extrabold px-3 py-1 rounded-full bg-rose-500 text-white uppercase tracking-wider">AUDIT LIVE</span>
+          </div>
+          <p id="dash-encouragement" class="text-rose-100 text-sm sm:text-base font-semibold max-w-2xl leading-relaxed">
+            Checking your daily and weekly numbers...
           </p>
         </div>
-        <div class="absolute -right-6 -bottom-6 w-32 h-32 bg-white/10 rounded-full blur-xl"></div>
+        <div class="absolute -right-6 -bottom-6 w-32 h-32 bg-rose-500/20 rounded-full blur-xl"></div>
+      </div>
+
+      <!-- STRICT DAILY & WEEKLY STEP + CALORIE ACCOUNTABILITY ENGINE -->
+      <div id="strict-coach-panel" class="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border-2 border-slate-900 space-y-5">
+        <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3.5">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-lg">🚨</span>
+              <h3 class="font-extrabold text-slate-900 text-base sm:text-lg">Strict Coach — Daily &amp; Weekly Reality Check</h3>
+            </div>
+            <p class="text-xs text-slate-500">No sugarcoating. Direct check on your Steps + Calories.</p>
+          </div>
+          <span id="coach-overall-pill" class="text-xs font-extrabold px-3 py-1 rounded-full bg-rose-100 text-rose-800">⚠️ Action Needed</span>
+        </div>
+
+        <!-- Daily vs Weekly Breakdown Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Daily Check Card -->
+          <div id="daily-audit-card" class="rounded-2xl p-4 border bg-slate-50 border-slate-200 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-extrabold uppercase tracking-wider text-slate-700">📅 Selected Day Check</span>
+              <span id="daily-verdict-tag" class="text-[11px] font-extrabold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800">Checking</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div class="bg-white p-2.5 rounded-xl border border-slate-100">
+                <p class="text-slate-400 font-semibold">Calories</p>
+                <p id="audit-day-cal" class="font-extrabold text-slate-900 text-sm mt-0.5">0 / 2000</p>
+                <p id="audit-day-cal-note" class="text-[11px] font-bold text-slate-500 mt-0.5">--</p>
+              </div>
+              <div class="bg-white p-2.5 rounded-xl border border-slate-100">
+                <p class="text-slate-400 font-semibold">Steps</p>
+                <p id="audit-day-steps" class="font-extrabold text-slate-900 text-sm mt-0.5">0 / 10,000</p>
+                <p id="audit-day-steps-note" class="text-[11px] font-bold text-slate-500 mt-0.5">--</p>
+              </div>
+            </div>
+            <p id="daily-blunt-text" class="text-xs font-bold text-slate-800 leading-relaxed pt-1"></p>
+          </div>
+
+          <!-- Weekly Check Card -->
+          <div id="weekly-audit-card" class="rounded-2xl p-4 border bg-slate-50 border-slate-200 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-extrabold uppercase tracking-wider text-slate-700">📆 7-Day Weekly Pace</span>
+              <span id="weekly-verdict-tag" class="text-[11px] font-extrabold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800">Checking</span>
+            </div>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div class="bg-white p-2.5 rounded-xl border border-slate-100">
+                <p class="text-slate-400 font-semibold">7-Day Calories</p>
+                <p id="audit-wk-cal" class="font-extrabold text-slate-900 text-sm mt-0.5">0 / 14,000</p>
+                <p id="audit-wk-cal-note" class="text-[11px] font-bold text-slate-500 mt-0.5">--</p>
+              </div>
+              <div class="bg-white p-2.5 rounded-xl border border-slate-100">
+                <p class="text-slate-400 font-semibold">7-Day Steps</p>
+                <p id="audit-wk-steps" class="font-extrabold text-slate-900 text-sm mt-0.5">0 / 70,000</p>
+                <p id="audit-wk-steps-note" class="text-[11px] font-bold text-slate-500 mt-0.5">--</p>
+              </div>
+            </div>
+            <p id="weekly-blunt-text" class="text-xs font-bold text-slate-800 leading-relaxed pt-1"></p>
+          </div>
+        </div>
+
+        <!-- Warning & Daant Alert List -->
+        <div id="coach-warnings-list" class="space-y-2"></div>
       </div>
 
       <!-- Calories & Macros Main Card -->
@@ -188,7 +250,7 @@
         <div class="flex items-center justify-between mb-5">
           <div>
             <h3 class="font-bold text-slate-900 text-lg">Daily Nutrition</h3>
-            <p class="text-xs text-slate-500">Values are friendly estimates to guide you</p>
+            <p class="text-xs text-slate-500">Har bite count hoti hai — andaze se mat chal</p>
           </div>
           <span class="inline-flex items-center gap-1 bg-amber-50 text-amber-700 border border-amber-200 text-[11px] px-2.5 py-1 rounded-full font-semibold">
             ~Est. Values
@@ -271,8 +333,8 @@
               <button onclick="switchTab('food')" class="flex-1 bg-slate-900 hover:bg-slate-800 text-white font-semibold text-sm py-2.5 px-4 rounded-2xl transition active:scale-95 flex items-center justify-center gap-2 shadow-sm">
                 <span>+</span> Log Food
               </button>
-              <button onclick="switchTab('track')" class="flex-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-semibold text-sm py-2.5 px-4 rounded-2xl transition active:scale-95 flex items-center justify-center gap-2">
-                <span>✨</span> Check-in
+              <button onclick="switchTab('track')" class="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-semibold text-sm py-2.5 px-4 rounded-2xl transition active:scale-95 flex items-center justify-center gap-2 shadow-sm">
+                <span>👟</span> Log Steps
               </button>
             </div>
           </div>
@@ -347,9 +409,7 @@
         </div>
 
         <!-- Food Database Results List -->
-        <div id="food-search-results" class="space-y-2 max-h-72 overflow-y-auto pr-1">
-          <!-- Populated dynamically -->
-        </div>
+        <div id="food-search-results" class="space-y-2 max-h-72 overflow-y-auto pr-1"></div>
       </div>
 
       <!-- Today's Logged Meals -->
@@ -358,9 +418,7 @@
           <h3 class="text-lg font-extrabold text-slate-900">Logged Meals</h3>
           <span id="food-total-badge" class="text-xs font-bold bg-emerald-50 text-emerald-700 px-3 py-1 rounded-full">0 kcal ~Est.</span>
         </div>
-        <div id="logged-meals-container" class="space-y-5">
-          <!-- Populated dynamically -->
-        </div>
+        <div id="logged-meals-container" class="space-y-5"></div>
       </div>
     </section>
 
@@ -369,112 +427,17 @@
     <!-- ========================================================= -->
     <section id="view-track" class="view-section hidden space-y-6">
 
-      <!-- 1. Gut Health Tracker -->
+      <!-- 1. Activity Tracker (Moved Top for Zero Excuses) -->
       <div class="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-slate-100">
-        <div class="flex items-center gap-3 mb-5">
-          <div class="w-11 h-11 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-2xl">🌿</div>
-          <div>
-            <h2 class="text-lg font-extrabold text-slate-900">Gut Health Tracker</h2>
-            <p class="text-xs text-slate-500">Notice patterns gently—your gut tells a story</p>
-          </div>
-        </div>
-
-        <div class="space-y-5">
-          <!-- Bowel Movement Counter -->
-          <div class="flex items-center justify-between bg-slate-50 p-4 rounded-2xl">
+        <div class="flex items-center justify-between gap-3 mb-5">
+          <div class="flex items-center gap-3">
+            <div class="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl">👟</div>
             <div>
-              <p class="font-bold text-sm text-slate-800">Bowel Movements</p>
-              <p class="text-xs text-slate-500">Count for the day</p>
-            </div>
-            <div class="flex items-center gap-3">
-              <button onclick="adjustBowel(-1)" class="w-10 h-10 rounded-xl bg-white border border-slate-200 font-bold text-lg text-slate-700 hover:bg-slate-100 active:scale-95 transition">-</button>
-              <span id="gut-bm-count" class="w-8 text-center font-extrabold text-lg text-slate-900">0</span>
-              <button onclick="adjustBowel(1)" class="w-10 h-10 rounded-xl bg-amber-500 text-white font-bold text-lg hover:bg-amber-600 active:scale-95 transition shadow-sm">+</button>
+              <h2 class="text-lg font-extrabold text-slate-900">Steps & Workouts</h2>
+              <p class="text-xs text-slate-500">Target: <strong id="track-step-goal-lbl">10,000</strong> steps/day — bahane nahi chalenge</p>
             </div>
           </div>
-
-          <!-- Acidity Level (0-5) -->
-          <div>
-            <div class="flex justify-between items-center mb-2">
-              <label class="font-bold text-sm text-slate-800">Acidity Level (0 = None, 5 = High)</label>
-              <span id="gut-acidity-label" class="text-xs font-bold text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-full">0 / 5</span>
-            </div>
-            <div class="grid grid-cols-6 gap-2" id="acidity-scale">
-              <!-- Generated 0-5 buttons -->
-            </div>
-          </div>
-
-          <!-- Bloating Level (0-5) -->
-          <div>
-            <div class="flex justify-between items-center mb-2">
-              <label class="font-bold text-sm text-slate-800">Bloating Level (0 = Flat, 5 = Very Bloated)</label>
-              <span id="gut-bloating-label" class="text-xs font-bold text-rose-700 bg-rose-50 px-2.5 py-0.5 rounded-full">0 / 5</span>
-            </div>
-            <div class="grid grid-cols-6 gap-2" id="bloating-scale">
-              <!-- Generated 0-5 buttons -->
-            </div>
-          </div>
-
-          <!-- Gut Notes -->
-          <div>
-            <label class="block font-bold text-sm text-slate-800 mb-1.5">Quick Gut Notes</label>
-            <textarea id="gut-notes" rows="2" placeholder="e.g., Felt light after curd & rice, slight acidity after late chai..." class="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 focus:bg-white"></textarea>
-          </div>
-
-          <button onclick="saveGutLog()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-2xl text-sm transition active:scale-98 shadow-sm">
-            Save Gut Check-in
-          </button>
-        </div>
-      </div>
-
-      <!-- 2. Sleep Tracker -->
-      <div class="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-slate-100">
-        <div class="flex items-center gap-3 mb-5">
-          <div class="w-11 h-11 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-2xl">🌙</div>
-          <div>
-            <h2 class="text-lg font-extrabold text-slate-900">Sleep & Routine</h2>
-            <p class="text-xs text-slate-500">Good rest powers better energy & digestion</p>
-          </div>
-        </div>
-
-        <div class="space-y-4">
-          <div class="grid grid-cols-2 gap-3">
-            <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1.5">Bedtime</label>
-              <input id="sleep-bedtime" type="time" value="23:00" onchange="calculateSleepDuration()" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-            </div>
-            <div>
-              <label class="block text-xs font-bold text-slate-600 mb-1.5">Wake-up Time</label>
-              <input id="sleep-waketime" type="time" value="07:00" onchange="calculateSleepDuration()" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-            </div>
-          </div>
-
-          <div class="flex items-center justify-between bg-indigo-50/70 px-4 py-3 rounded-2xl">
-            <span class="text-xs font-bold text-indigo-800">Estimated Sleep Duration</span>
-            <span id="sleep-duration-display" class="text-base font-extrabold text-indigo-700">8.0 hrs</span>
-          </div>
-
-          <div>
-            <label class="block text-xs font-bold text-slate-600 mb-2">Sleep Quality</label>
-            <div class="flex items-center gap-2" id="sleep-stars">
-              <!-- 1-5 stars -->
-            </div>
-          </div>
-
-          <button onclick="saveSleepLog()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-2xl text-sm transition active:scale-98 shadow-sm">
-            Save Sleep Log
-          </button>
-        </div>
-      </div>
-
-      <!-- 3. Activity Tracker -->
-      <div class="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-slate-100">
-        <div class="flex items-center gap-3 mb-5">
-          <div class="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl">👟</div>
-          <div>
-            <h2 class="text-lg font-extrabold text-slate-900">Steps & Workouts</h2>
-            <p class="text-xs text-slate-500">All movement counts—even a 10-minute walk</p>
-          </div>
+          <span id="track-step-pct" class="text-xs font-extrabold px-2.5 py-1 rounded-full bg-slate-100 text-slate-700">0%</span>
         </div>
 
         <div class="space-y-4">
@@ -515,13 +478,101 @@
           </button>
         </div>
       </div>
+
+      <!-- 2. Gut Health Tracker -->
+      <div class="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-slate-100">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-11 h-11 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-2xl">🌿</div>
+          <div>
+            <h2 class="text-lg font-extrabold text-slate-900">Gut Health Tracker</h2>
+            <p class="text-xs text-slate-500">Digestion kharab hogi toh weight bhi atak jayega</p>
+          </div>
+        </div>
+
+        <div class="space-y-5">
+          <div class="flex items-center justify-between bg-slate-50 p-4 rounded-2xl">
+            <div>
+              <p class="font-bold text-sm text-slate-800">Bowel Movements</p>
+              <p class="text-xs text-slate-500">Count for the day</p>
+            </div>
+            <div class="flex items-center gap-3">
+              <button onclick="adjustBowel(-1)" class="w-10 h-10 rounded-xl bg-white border border-slate-200 font-bold text-lg text-slate-700 hover:bg-slate-100 active:scale-95 transition">-</button>
+              <span id="gut-bm-count" class="w-8 text-center font-extrabold text-lg text-slate-900">0</span>
+              <button onclick="adjustBowel(1)" class="w-10 h-10 rounded-xl bg-amber-500 text-white font-bold text-lg hover:bg-amber-600 active:scale-95 transition shadow-sm">+</button>
+            </div>
+          </div>
+
+          <div>
+            <div class="flex justify-between items-center mb-2">
+              <label class="font-bold text-sm text-slate-800">Acidity Level (0 = None, 5 = High)</label>
+              <span id="gut-acidity-label" class="text-xs font-bold text-amber-700 bg-amber-50 px-2.5 py-0.5 rounded-full">0 / 5</span>
+            </div>
+            <div class="grid grid-cols-6 gap-2" id="acidity-scale"></div>
+          </div>
+
+          <div>
+            <div class="flex justify-between items-center mb-2">
+              <label class="font-bold text-sm text-slate-800">Bloating Level (0 = Flat, 5 = Very Bloated)</label>
+              <span id="gut-bloating-label" class="text-xs font-bold text-rose-700 bg-rose-50 px-2.5 py-0.5 rounded-full">0 / 5</span>
+            </div>
+            <div class="grid grid-cols-6 gap-2" id="bloating-scale"></div>
+          </div>
+
+          <div>
+            <label class="block font-bold text-sm text-slate-800 mb-1.5">Quick Gut Notes</label>
+            <textarea id="gut-notes" rows="2" placeholder="e.g., Felt light after curd & rice, acidity after late chai..." class="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 focus:bg-white"></textarea>
+          </div>
+
+          <button onclick="saveGutLog()" class="w-full bg-amber-500 hover:bg-amber-600 text-white font-bold py-3 rounded-2xl text-sm transition active:scale-98 shadow-sm">
+            Save Gut Check-in
+          </button>
+        </div>
+      </div>
+
+      <!-- 3. Sleep Tracker -->
+      <div class="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-slate-100">
+        <div class="flex items-center gap-3 mb-5">
+          <div class="w-11 h-11 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-2xl">🌙</div>
+          <div>
+            <h2 class="text-lg font-extrabold text-slate-900">Sleep & Routine</h2>
+            <p class="text-xs text-slate-500">Kam neend = zyada cravings + slow recovery</p>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1.5">Bedtime</label>
+              <input id="sleep-bedtime" type="time" value="23:00" onchange="calculateSleepDuration()" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+            </div>
+            <div>
+              <label class="block text-xs font-bold text-slate-600 mb-1.5">Wake-up Time</label>
+              <input id="sleep-waketime" type="time" value="07:00" onchange="calculateSleepDuration()" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+            </div>
+          </div>
+
+          <div class="flex items-center justify-between bg-indigo-50/70 px-4 py-3 rounded-2xl">
+            <span class="text-xs font-bold text-indigo-800">Estimated Sleep Duration</span>
+            <span id="sleep-duration-display" class="text-base font-extrabold text-indigo-700">8.0 hrs</span>
+          </div>
+
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-2">Sleep Quality</label>
+            <div class="flex items-center gap-2" id="sleep-stars"></div>
+          </div>
+
+          <button onclick="saveSleepLog()" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 rounded-2xl text-sm transition active:scale-98 shadow-sm">
+            Save Sleep Log
+          </button>
+        </div>
+      </div>
     </section>
 
     <!-- ========================================================= -->
     <!-- VIEW 4: MEAL PLANNER & REPORTS                            -->
     <!-- ========================================================= -->
     <section id="view-plan" class="view-section hidden space-y-6">
-<!-- PINNED WEEKLY WEIGHT TREND + SHIFT INDIAN MEAL PLANNER -->
+      <!-- PINNED WEEKLY WEIGHT TREND + SHIFT INDIAN MEAL PLANNER -->
       <div class="space-y-4 mb-6">
 
         <!-- 1. Pinned Weekly Weight Trend (Locked Card) -->
@@ -552,7 +603,6 @@
 
         <!-- 2. Water Intake & Gut/Poop Check-in -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- Water Tracker -->
           <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-100 space-y-3">
             <div class="flex items-center justify-between">
               <h3 class="text-sm font-extrabold text-slate-900">💧 Water Intake</h3>
@@ -568,7 +618,6 @@
             </div>
           </div>
 
-          <!-- Gut & Poop Check-in -->
           <div class="bg-white rounded-3xl p-5 shadow-sm border border-slate-100 space-y-3">
             <h3 class="text-sm font-extrabold text-slate-900">🌿 Gut & Poop Check-in</h3>
             <div class="grid grid-cols-3 gap-2">
@@ -619,12 +668,13 @@
         </div>
 
       </div>
+
       <!-- Weight Logger & Trend Charts -->
-      <div class="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-slate-100">
-        <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+      <div class="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-slate-100 space-y-5">
+        <div class="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h2 class="text-lg font-extrabold text-slate-900">Weight & Weekly Trends</h2>
-            <p class="text-xs text-slate-500">Focus on the gentle trend over time, not daily fluctuations</p>
+            <h2 class="text-lg font-extrabold text-slate-900">Weight &amp; 7-Day Step/Calorie Report</h2>
+            <p class="text-xs text-slate-500">Hafte ka sach yahan dikhega — steps aur calories dono</p>
           </div>
           <div class="flex items-center gap-2">
             <input id="weight-input" type="number" step="0.1" min="20" max="300" placeholder="kg" class="w-24 px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold focus:outline-none focus:ring-2 focus:ring-rose-400" />
@@ -634,15 +684,29 @@
           </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- 7-Day Day-by-Day Scorecard Table -->
+        <div id="weekly-scorecard-box" class="overflow-x-auto bg-slate-50 p-3.5 rounded-2xl border border-slate-200"></div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
           <!-- 7-Day Calorie Chart -->
           <div class="bg-slate-50/70 p-4 rounded-2xl border border-slate-100">
             <div class="flex items-center justify-between mb-3">
               <h3 class="text-sm font-bold text-slate-800">7-Day Calories (~Est.)</h3>
-              <span class="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">Target: <span id="chart-cal-target-lbl">2000</span></span>
+              <span class="text-[11px] font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full">Goal: <span id="chart-cal-target-lbl">2000</span></span>
             </div>
-            <div class="h-52 relative">
+            <div class="h-48 relative">
               <canvas id="calorieChart"></canvas>
+            </div>
+          </div>
+
+          <!-- 7-Day Steps Chart -->
+          <div class="bg-slate-50/70 p-4 rounded-2xl border border-slate-100">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-sm font-bold text-slate-800">7-Day Steps</h3>
+              <span class="text-[11px] font-semibold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full">Goal: <span id="chart-step-target-lbl">10000</span></span>
+            </div>
+            <div class="h-48 relative">
+              <canvas id="stepsChart"></canvas>
             </div>
           </div>
 
@@ -652,7 +716,7 @@
               <h3 class="text-sm font-bold text-slate-800">Weight Trend (kg)</h3>
               <span class="text-[11px] font-semibold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-full">Goal: <span id="chart-wt-target-lbl">--</span> kg</span>
             </div>
-            <div class="h-52 relative">
+            <div class="h-48 relative">
               <canvas id="weightChart"></canvas>
             </div>
           </div>
@@ -663,20 +727,12 @@
       <div class="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-slate-100">
         <div class="mb-4">
           <h2 class="text-lg font-extrabold text-slate-900">Personalised Weekly Meal Planner</h2>
-          <p class="text-xs text-slate-500">Sketch a flexible plan for your week—swap anytime guilt-free</p>
+          <p class="text-xs text-slate-500">Pehle se plan bana le taaki bhookh lagne pe junk na khaye</p>
         </div>
 
-        <!-- Mon-Sun Tabs -->
-        <div class="flex gap-1.5 overflow-x-auto no-scrollbar pb-2 mb-4" id="planner-days-tabs">
-          <!-- Generated dynamically -->
-        </div>
+        <div class="flex gap-1.5 overflow-x-auto no-scrollbar pb-2 mb-4" id="planner-days-tabs"></div>
+        <div id="planner-meals-list" class="space-y-3 mb-5"></div>
 
-        <!-- Planned Meals List for Selected Day -->
-        <div id="planner-meals-list" class="space-y-3 mb-5">
-          <!-- Populated dynamically -->
-        </div>
-
-        <!-- Add Planned Meal Form -->
         <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 space-y-3">
           <p class="text-xs font-bold text-slate-700 uppercase tracking-wide">Add to <span id="planner-active-day-label">Mon</span> Plan</p>
           <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5">
@@ -701,24 +757,28 @@
     <!-- ========================================================= -->
     <section id="view-settings" class="view-section hidden space-y-6">
 
-      <!-- Personalised Nutrition Targets -->
+      <!-- Personalised Nutrition & Step Targets -->
       <div class="bg-white rounded-3xl p-5 sm:p-6 shadow-sm border border-slate-100">
         <div class="flex items-center gap-3 mb-5">
           <div class="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl">🎯</div>
           <div>
             <h2 class="text-lg font-extrabold text-slate-900">Personalised Targets</h2>
-            <p class="text-xs text-slate-500">Tailor Mission 55 to your body and pace</p>
+            <p class="text-xs text-slate-500">Set honest calorie &amp; daily step targets — coach isi pe judge karega</p>
           </div>
         </div>
 
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div class="sm:col-span-2">
             <label class="block text-xs font-bold text-slate-600 mb-1.5">Your Name</label>
-            <input id="set-name" type="text" placeholder="Friend" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-400" />
+            <input id="set-name" type="text" placeholder="Dhanisha" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-400" />
           </div>
           <div>
             <label class="block text-xs font-bold text-slate-600 mb-1.5">Daily Calories Target (kcal)</label>
             <input id="set-calories" type="number" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-400" />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-600 mb-1.5">Daily Steps Target (steps/day)</label>
+            <input id="set-steps" type="number" step="500" placeholder="10000" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-400" />
           </div>
           <div>
             <label class="block text-xs font-bold text-slate-600 mb-1.5">Target Weight (kg)</label>
@@ -732,7 +792,7 @@
             <label class="block text-xs font-bold text-slate-600 mb-1.5">Carbs Target (g)</label>
             <input id="set-carbs" type="number" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-400" />
           </div>
-          <div class="sm:col-span-2">
+          <div>
             <label class="block text-xs font-bold text-slate-600 mb-1.5">Fats Target (g)</label>
             <input id="set-fat" type="number" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-400" />
           </div>
@@ -741,6 +801,15 @@
         <button onclick="saveTargets()" class="mt-5 w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-3 rounded-2xl text-sm transition active:scale-98 shadow-sm">
           Save Personalised Targets
         </button>
+
+        <!-- Local JSON Backup / Restore -->
+        <div class="mt-4 pt-4 border-t border-slate-100 flex gap-2">
+          <button type="button" onclick="exportMission55Backup()" class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs rounded-xl">💾 Export Backup</button>
+          <label class="flex-1 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs rounded-xl text-center cursor-pointer">
+            📂 Restore Backup
+            <input type="file" accept=".json" class="hidden" onchange="importMission55Backup(event)" />
+          </label>
+        </div>
       </div>
 
       <!-- Supabase Cloud Sync Card -->
@@ -756,7 +825,6 @@
           <span id="settings-sync-status" class="text-xs font-bold px-3 py-1 rounded-full bg-amber-100 text-amber-800">Not Connected</span>
         </div>
 
-        <!-- Step 1: Project URL & Anon Key -->
         <div class="space-y-3 bg-slate-50 p-4 rounded-2xl border border-slate-100 mb-5">
           <p class="text-xs font-bold text-slate-700">1. Connect your Supabase Project</p>
           <div>
@@ -772,9 +840,7 @@
           </button>
         </div>
 
-        <!-- Step 2: Account Auth (Shown when configured) -->
         <div id="sb-auth-section" class="space-y-4">
-          <!-- Logged Out View -->
           <div id="sb-logged-out-view" class="space-y-3">
             <p class="text-xs font-bold text-slate-700">2. Sign In or Create Cloud Account</p>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -791,7 +857,6 @@
             </div>
           </div>
 
-          <!-- Logged In View -->
           <div id="sb-logged-in-view" class="hidden bg-emerald-50/70 border border-emerald-100 rounded-2xl p-4 space-y-3">
             <div class="flex items-center justify-between flex-wrap gap-2">
               <div>
@@ -853,7 +918,6 @@
         <button onclick="closePortionModal()" class="p-2 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-700">✕</button>
       </div>
 
-      <!-- Multiplier Quick Buttons -->
       <div>
         <label class="block text-xs font-bold text-slate-600 mb-2">Portion Multiplier</label>
         <div class="grid grid-cols-4 gap-2 mb-2.5">
@@ -865,7 +929,6 @@
         <input id="pm-custom-qty" type="number" step="0.1" min="0.1" value="1" oninput="updatePortionPreview()" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-bold text-center focus:outline-none focus:ring-2 focus:ring-emerald-400" />
       </div>
 
-      <!-- Live Macro Preview -->
       <div class="grid grid-cols-4 gap-2 bg-slate-50 p-3.5 rounded-2xl text-center">
         <div>
           <p class="text-[10px] font-bold text-slate-400 uppercase">Calories</p>
@@ -885,7 +948,6 @@
         </div>
       </div>
 
-      <!-- Meal Type Picker -->
       <div>
         <label class="block text-xs font-bold text-slate-600 mb-1.5">Add to Meal</label>
         <select id="pm-meal-type" class="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl text-sm font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-400">
@@ -910,19 +972,19 @@
         <button onclick="closeCustomFoodModal()" class="p-2 rounded-xl hover:bg-slate-100 text-slate-400 hover:text-slate-700">✕</button>
       </div>
 
-      <div class="space-y-3"><!-- Smart Auto-Calculator -->
-          <div class="bg-indigo-50/70 border border-indigo-100 rounded-2xl p-3 space-y-2">
-            <label class="block text-xs font-bold text-indigo-800">✨ Smart Auto-Calculate (Type ingredients)</label>
-            <div class="flex gap-2">
-              <input id="cf-smart-input" type="text" placeholder="e.g., 2 egg white and 3 egg yellow"
-                class="flex-1 p-2 bg-white border border-indigo-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-400" />
-              <button type="button" onclick="autoCalculateCustomFood()"
-                class="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shrink-0">
-                Calculate
-              </button>
-            </div>
-            <p id="cf-smart-status" class="text-[11px] text-indigo-600 hidden"></p>
+      <div class="space-y-3">
+        <div class="bg-indigo-50/70 border border-indigo-100 rounded-2xl p-3 space-y-2">
+          <label class="block text-xs font-bold text-indigo-800">✨ Smart Auto-Calculate (Type ingredients)</label>
+          <div class="flex gap-2">
+            <input id="cf-smart-input" type="text" placeholder="e.g., 2 egg white and 3 egg yellow"
+              class="flex-1 p-2 bg-white border border-indigo-200 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-indigo-400" />
+            <button type="button" onclick="autoCalculateCustomFood()"
+              class="px-3 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shrink-0">
+              Calculate
+            </button>
           </div>
+          <p id="cf-smart-status" class="text-[11px] text-indigo-600 hidden"></p>
+        </div>
         <div>
           <label class="block text-xs font-bold text-slate-600 mb-1">Food Name</label>
           <input id="cf-name" type="text" placeholder="e.g., Homemade Moong Dal Chilla" class="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400" />
@@ -988,14 +1050,6 @@
       { id: 'b20', name: 'Roasted Makhana', serving_size: '1 bowl (30g)', calories: 110, protein_g: 3, carbs_g: 22, fat_g: 1, is_estimated: true },
     ];
 
-    const ENCOURAGEMENTS = [
-      "Balance is built over weeks, not one meal. Keep showing up!",
-      "Progress beats perfection every single day. You've got this! ✨",
-      "Had a Subway or tiramisu? Enjoy it fully—health includes joy too! 🍰",
-      "Small daily check-ins create massive long-term wins. Proud of you!",
-      "Hydrate, breathe, and nourish yourself kindly today. 💚"
-    ];
-
     const DAYS_OF_WEEK = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     const STORAGE_KEY = 'mission61_data_v1';
     const SB_CONFIG_KEY = 'mission61_sb_config';
@@ -1007,18 +1061,19 @@
       profile: {
         full_name: 'Friend',
         target_calories: 2000,
+        target_steps: 10000,
         target_protein_g: 120,
         target_carbs_g: 220,
         target_fat_g: 65,
-        target_weight_kg: 68,
+        target_weight_kg: 55,
       },
       customFoods: [],
-      foodLogs: [],      // { id, log_date, meal_type, food_name, quantity, calories, protein_g, carbs_g, fat_g, is_estimated }
-      gutLogs: {},       // keyed by YYYY-MM-DD
-      sleepLogs: {},     // keyed by YYYY-MM-DD
-      activityLogs: {},  // keyed by YYYY-MM-DD
-      mealPlans: [],     // { id, day_of_week, meal_type, planned_meal, est_calories }
-      weightLogs: [],    // { id, log_date, weight_kg }
+      foodLogs: [],
+      gutLogs: {},
+      sleepLogs: {},
+      activityLogs: {},
+      mealPlans: [],
+      weightLogs: [],
     };
 
     let activeTab = 'dashboard';
@@ -1029,11 +1084,10 @@
     let gutDraft = { bowel_movement_count: 0, acidity_level: 0, bloating_level: 0, notes: '' };
     let sleepQualityDraft = 4;
 
-    // Chart.js instances
     let calorieChartInstance = null;
+    let stepsChartInstance = null;
     let weightChartInstance = null;
 
-    // Supabase client & auth state
     let sbClient = null;
     let currentUser = null;
 
@@ -1045,6 +1099,22 @@
       const offset = now.getTimezoneOffset();
       const local = new Date(now.getTime() - offset * 60000);
       return local.toISOString().split('T')[0];
+    }
+
+    function getLast7DaysDates() {
+      const arr = [];
+      for (let i = 6; i >= 0; i--) {
+        const d = new Date();
+        d.setDate(d.getDate() - i);
+        const offset = d.getTimezoneOffset();
+        const local = new Date(d.getTime() - offset * 60000);
+        arr.push({
+          iso: local.toISOString().split('T')[0],
+          label: local.toLocaleDateString('en-IN', { weekday: 'short' }),
+          shortDate: local.toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })
+        });
+      }
+      return arr;
     }
 
     function getCurrentDayShort() {
@@ -1072,7 +1142,7 @@
       const colors = {
         success: 'bg-slate-900 text-white border-slate-700',
         info: 'bg-indigo-600 text-white border-indigo-500',
-        warn: 'bg-amber-500 text-white border-amber-400',
+        warn: 'bg-rose-600 text-white border-rose-500',
       };
       toast.className = `${colors[type] || colors.success} px-4 py-3 rounded-2xl shadow-lg border text-xs sm:text-sm font-semibold pointer-events-auto transition-all duration-300 transform translate-y-0 opacity-100`;
       toast.textContent = message;
@@ -1080,7 +1150,7 @@
       setTimeout(() => {
         toast.classList.add('opacity-0', '-translate-y-2');
         setTimeout(() => toast.remove(), 300);
-      }, 3000);
+      }, 3200);
     }
 
     // =========================================================================
@@ -1119,25 +1189,22 @@
         document.getElementById(`view-${t}`).classList.toggle('hidden', t !== tab);
       });
 
-      // Show/hide global date bar
       const showDateBar = ['dashboard', 'food', 'track'].includes(tab);
       document.getElementById('global-date-bar').classList.toggle('hidden', !showDateBar);
 
-      // Update Desktop Nav styling
       document.querySelectorAll('.nav-btn').forEach(btn => {
         const isActive = btn.dataset.tab === tab;
         btn.className = `nav-btn w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-semibold transition-all ${
           isActive
-            ? 'bg-emerald-50 text-emerald-700 shadow-sm'
+            ? 'bg-slate-900 text-white shadow-sm'
             : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
         }`;
       });
 
-      // Update Mobile Nav styling
       document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
         const isActive = btn.dataset.tab === tab;
         btn.className = `mobile-nav-btn flex flex-col items-center justify-center py-1.5 rounded-2xl transition ${
-          isActive ? 'text-emerald-600 bg-emerald-50/80' : 'text-slate-400'
+          isActive ? 'text-rose-600 bg-rose-50' : 'text-slate-400'
         }`;
       });
 
@@ -1160,16 +1227,163 @@
     }
 
     // =========================================================================
-    // 6. RENDERING: DASHBOARD
+    // 6. BLUNT STRICT ACCOUNTABILITY ANALYSIS ENGINE (DAILY + WEEKLY)
+    // =========================================================================
+    function evaluateStrictAccountability(dayTotals, daySteps) {
+      const name = state.profile.full_name || 'Boss';
+      const tCal = Number(state.profile.target_calories) || 2000;
+      const tSteps = Number(state.profile.target_steps) || 10000;
+      const tPro = Number(state.profile.target_protein_g) || 120;
+
+      const dayCal = Math.round(dayTotals.cal);
+      const dayPro = Math.round(dayTotals.pro);
+      const calDiff = dayCal - tCal; // + means over, - means under
+      const stepDiff = tSteps - daySteps; // + means remaining
+
+      // Compute 7-day window stats
+      const last7 = getLast7DaysDates();
+      let wkCalSum = 0;
+      let wkStepSum = 0;
+      let loggedFoodDays = 0;
+      let stepHitDays = 0;
+      let overCalDays = 0;
+
+      last7.forEach(d => {
+        const c = state.foodLogs
+          .filter(l => l.log_date === d.iso)
+          .reduce((s, x) => s + (Number(x.calories) || 0), 0);
+        const st = Number((state.activityLogs[d.iso] && state.activityLogs[d.iso].steps) || 0);
+        wkCalSum += c;
+        wkStepSum += st;
+        if (c > 0) loggedFoodDays++;
+        if (c > tCal + 100) overCalDays++;
+        if (st >= tSteps) stepHitDays++;
+      });
+
+      const wkCalTarget = tCal * 7;
+      const wkStepTarget = tSteps * 7;
+      const wkCalDiff = Math.round(wkCalSum - wkCalTarget);
+      const wkStepPct = Math.round((wkStepSum / Math.max(1, wkStepTarget)) * 100);
+      const dayStepPct = Math.round((daySteps / Math.max(1, tSteps)) * 100);
+
+      const warnings = [];
+      let dailyVerdict = { tag: 'ON TRACK', tone: 'good', text: '' };
+      let weeklyVerdict = { tag: 'ON PACE', tone: 'good', text: '' };
+
+      // ---- DAILY BLUNT VERDICT ----
+      if (dayCal === 0 && daySteps === 0) {
+        dailyVerdict = {
+          tag: 'ZERO LOGGED 🚨',
+          tone: 'bad',
+          text: `${name}, aaj na khana log kiya hai na steps! Tracker khali chhodne se weight kam nahi hota — abhi log kar warna din waste samajh.`
+        };
+        warnings.push({ level: 'red', msg: `🚨 KHAALI DIN: Aaj 0 kcal aur 0 steps logged hain. Apne aap se jhooth mat bol — jo khaya aur jitna chali, turant daal.` });
+      } else if (calDiff > 150 && daySteps < tSteps * 0.6) {
+        dailyVerdict = {
+          tag: 'RED ALERT 🛑',
+          tone: 'bad',
+          text: `Limit se +${calDiff} kcal zyada kha liya aur steps sirf ${daySteps.toLocaleString()} (${dayStepPct}%)! Khaana full speed mein aur chalna zero — aise Mission 55 kabhi poora nahi hoga.`
+        };
+        warnings.push({ level: 'red', msg: `🛑 DOUBLE DAMAGE: ${calDiff} kcal extra + ${stepDiff.toLocaleString()} steps kam. Abhi 30-40 min brisk walk pe nikal warna yeh seedha fat banega.` });
+      } else if (calDiff > 150) {
+        dailyVerdict = {
+          tag: 'OVER BUDGET ⚠️',
+          tone: 'warn',
+          text: `Steps toh ${daySteps.toLocaleString()} kar liye, par ${calDiff} kcal target ke upar chala gaya! Extra walk karke bhi plate pe control nahi rakha toh deficit khatam.`
+        };
+        warnings.push({ level: 'amber', msg: `⚠️ CALORIE OVERFLOW: Target se +${calDiff} kcal upar hai. Kal strictly ${Math.max(1200, tCal - Math.min(300, calDiff))} kcal pe reh ke damage control kar.` });
+      } else if (daySteps < tSteps * 0.5) {
+        dailyVerdict = {
+          tag: 'LAZY STEPS 🐢',
+          tone: 'bad',
+          text: `Calories (${dayCal} kcal) control mein hain, par steps sirf ${daySteps.toLocaleString()} / ${tSteps.toLocaleString()} hain! Sirf kam khaane se body tight nahi hoti — uth aur ${stepDiff.toLocaleString()} steps poore kar.`
+        };
+        warnings.push({ level: 'red', msg: `👟 STEP SHORTFALL: Abhi bhi ${stepDiff.toLocaleString()} steps baaki hain. Phone rakh aur chalna shuru kar!` });
+      } else if (daySteps < tSteps) {
+        dailyVerdict = {
+          tag: 'ADHURA TARGET ⏳',
+          tone: 'warn',
+          text: `Calories sahi ja rahi hain (${dayCal}/${tCal} kcal), par ${stepDiff.toLocaleString()} steps abhi bhi pending hain. Aadha-adhoora kaam mat chhod, aaj hi finish kar!`
+        };
+      } else {
+        dailyVerdict = {
+          tag: 'SOLID DISCIPLINE ✅',
+          tone: 'good',
+          text: `Badiya! ${dayCal}/${tCal} kcal aur ${daySteps.toLocaleString()} steps dono hit kiye. Bas yahi consistency chahiye — kal phir repeat karna, overconfident mat hona.`
+        };
+      }
+
+      // ---- PROTEIN & GUT WARNINGS ----
+      if (dayCal > 600 && dayPro < tPro * 0.55) {
+        warnings.push({ level: 'amber', msg: `🥩 PROTEIN BAHUT KAM HAI: Sirf ${dayPro}g / ${tPro}g protein liya hai. Sirf carbs bharogi toh muscle giregi aur bhookh double lagegi!` });
+      }
+      const gutToday = state.gutLogs[selectedDate];
+      if (gutToday && (gutToday.acidity_level >= 3 || gutToday.bloating_level >= 3)) {
+        warnings.push({ level: 'amber', msg: `🌿 GUT WARNING: Acidity ${gutToday.acidity_level}/5, Bloating ${gutToday.bloating_level}/5. Late-night chai, maida aur bahar ka khana turant band kar.` });
+      }
+
+      // ---- WEEKLY BLUNT VERDICT ----
+      if (loggedFoodDays < 4) {
+        weeklyVerdict = {
+          tag: 'LAAPARWAH HAFTA 🚨',
+          tone: 'bad',
+          text: `Pichhle 7 din mein sirf ${loggedFoodDays}/7 din food log kiya aur total steps ${wkStepSum.toLocaleString()} (${wkStepPct}%) hain. Half-tracking se sirf khud ko dhokha milta hai!`
+        };
+        warnings.push({ level: 'red', msg: `📉 WEEKLY AUDIT FAIL: Hafte mein ${7 - loggedFoodDays} din ka data gayab hai. Roz log nahi karegi toh weight atakne pe rona mat.` });
+      } else if (wkCalDiff > 500 && wkStepPct < 75) {
+        weeklyVerdict = {
+          tag: 'OFF TRACK WEEK 🛑',
+          tone: 'bad',
+          text: `7-day calories weekly budget se +${wkCalDiff.toLocaleString()} kcal zyada hain aur steps sirf ${wkStepPct}% (${stepHitDays}/7 din target hit). Is week fat loss nahi ho raha, seedha bol raha hoon!`
+        };
+        warnings.push({ level: 'red', msg: `🚨 WEEKLY REALITY CHECK: Weekly calorie surplus +${wkCalDiff} kcal aur ${7 - stepHitDays} din step target miss. Agle 3 din zero cheat meal aur 10k+ steps mandatory!` });
+      } else if (wkStepPct < 75) {
+        weeklyVerdict = {
+          tag: 'WEAK MOVEMENT ⚠️',
+          tone: 'warn',
+          text: `7-day calories (${Math.round(wkCalSum).toLocaleString()} kcal) toh control mein hain, par weekly steps sirf ${wkStepSum.toLocaleString()} / ${wkStepTarget.toLocaleString()} (${wkStepPct}%) hain. Sirf ${stepHitDays}/7 din target hit hua — movement badha!`
+        };
+        warnings.push({ level: 'amber', msg: `⚠️ WEEKLY STEPS LOW: Hafte ke target se ${(wkStepTarget - wkStepSum).toLocaleString()} steps peeche chal rahi hai.` });
+      } else if (wkCalDiff > 400 || overCalDays >= 3) {
+        weeklyVerdict = {
+          tag: 'CALORIE LEAK ⚠️',
+          tone: 'warn',
+          text: `Steps toh ${wkStepPct}% hit hain, par ${overCalDays}/7 din calorie limit todi (+${wkCalDiff} kcal weekly). Weekend/treat ke naam pe saari mehnat mitti mat kar.`
+        };
+      } else {
+        weeklyVerdict = {
+          tag: 'STRONG WEEK 🔥',
+          tone: 'good',
+          text: `7-day average bilkul sahi track pe hai: ${Math.round(wkCalSum).toLocaleString()} / ${wkCalTarget.toLocaleString()} kcal aur ${wkStepSum.toLocaleString()} steps (${wkStepPct}%). Isi pace pe Mission 55 pakka hit hoga!`
+        };
+      }
+
+      // Overall Banner Headline
+      let bannerHeadline = dailyVerdict.text;
+      let gradeText = 'ON TRACK ✅';
+      if (dailyVerdict.tone === 'bad' || weeklyVerdict.tone === 'bad') {
+        gradeText = 'STRICT WARNING 🚨';
+      } else if (dailyVerdict.tone === 'warn' || weeklyVerdict.tone === 'warn') {
+        gradeText = 'NEEDS FOCUS ⚠️';
+      }
+
+      return {
+        dayCal, tCal, calDiff,
+        daySteps, tSteps, stepDiff, dayStepPct,
+        wkCalSum: Math.round(wkCalSum), wkCalTarget, wkCalDiff,
+        wkStepSum, wkStepTarget, wkStepPct, stepHitDays,
+        dailyVerdict, weeklyVerdict, warnings,
+        bannerHeadline, gradeText
+      };
+    }
+
+    // =========================================================================
+    // 7. RENDERING: DASHBOARD
     // =========================================================================
     function renderDashboard() {
-      // Greeting
-      const hr = new Date().getHours();
-      const greetPrefix = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
       const name = state.profile.full_name || 'Friend';
-      document.getElementById('dash-greeting').textContent = `${greetPrefix}, ${name}! 👋`;
+      document.getElementById('dash-greeting').textContent = `Sun le, ${name}! 🎯`;
 
-      // Compute daily nutrition totals
       const dayLogs = state.foodLogs.filter(l => l.log_date === selectedDate);
       const totals = dayLogs.reduce((acc, item) => {
         acc.cal += Number(item.calories) || 0;
@@ -1183,32 +1397,104 @@
       const tPro = Number(state.profile.target_protein_g) || 120;
       const tCarb = Number(state.profile.target_carbs_g) || 220;
       const tFat = Number(state.profile.target_fat_g) || 65;
+      const tSteps = Number(state.profile.target_steps) || 10000;
 
-      // Update numbers
+      const act = state.activityLogs[selectedDate];
+      const daySteps = Number((act && act.steps) || 0);
+
+      // Run Blunt Accountability Engine
+      const audit = evaluateStrictAccountability(totals, daySteps);
+
+      // Update Top Banner
+      const bannerBox = document.getElementById('dash-banner-box');
+      const gradeBadge = document.getElementById('dash-grade-badge');
+      document.getElementById('dash-encouragement').textContent = audit.bannerHeadline;
+      gradeBadge.textContent = audit.gradeText;
+
+      if (audit.gradeText.includes('STRICT')) {
+        bannerBox.className = 'rounded-3xl bg-gradient-to-r from-rose-950 via-rose-800 to-slate-900 p-5 sm:p-6 text-white shadow-lg relative overflow-hidden';
+        gradeBadge.className = 'text-xs font-extrabold px-3 py-1 rounded-full bg-rose-500 text-white uppercase tracking-wider';
+      } else if (audit.gradeText.includes('FOCUS')) {
+        bannerBox.className = 'rounded-3xl bg-gradient-to-r from-slate-900 via-amber-900 to-slate-900 p-5 sm:p-6 text-white shadow-lg relative overflow-hidden';
+        gradeBadge.className = 'text-xs font-extrabold px-3 py-1 rounded-full bg-amber-400 text-slate-950 uppercase tracking-wider';
+      } else {
+        bannerBox.className = 'rounded-3xl bg-gradient-to-r from-slate-900 via-emerald-900 to-slate-900 p-5 sm:p-6 text-white shadow-lg relative overflow-hidden';
+        gradeBadge.className = 'text-xs font-extrabold px-3 py-1 rounded-full bg-emerald-500 text-white uppercase tracking-wider';
+      }
+
+      // Populate Strict Coach Card
+      const overallPill = document.getElementById('coach-overall-pill');
+      overallPill.textContent = audit.gradeText;
+      overallPill.className = `text-xs font-extrabold px-3 py-1 rounded-full ${
+        audit.gradeText.includes('STRICT') ? 'bg-rose-100 text-rose-800' :
+        audit.gradeText.includes('FOCUS') ? 'bg-amber-100 text-amber-800' :
+        'bg-emerald-100 text-emerald-800'
+      }`;
+
+      const toneStyles = {
+        bad: { card: 'rounded-2xl p-4 border-2 bg-rose-50/70 border-rose-300 space-y-2.5', tag: 'text-[11px] font-extrabold px-2.5 py-0.5 rounded-full bg-rose-600 text-white' },
+        warn: { card: 'rounded-2xl p-4 border-2 bg-amber-50/70 border-amber-300 space-y-2.5', tag: 'text-[11px] font-extrabold px-2.5 py-0.5 rounded-full bg-amber-500 text-white' },
+        good: { card: 'rounded-2xl p-4 border-2 bg-emerald-50/60 border-emerald-300 space-y-2.5', tag: 'text-[11px] font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-600 text-white' }
+      };
+
+      const dStyle = toneStyles[audit.dailyVerdict.tone];
+      document.getElementById('daily-audit-card').className = dStyle.card;
+      const dTag = document.getElementById('daily-verdict-tag');
+      dTag.className = dStyle.tag;
+      dTag.textContent = audit.dailyVerdict.tag;
+      document.getElementById('audit-day-cal').textContent = `${audit.dayCal} / ${audit.tCal}`;
+      document.getElementById('audit-day-cal-note').textContent = audit.calDiff > 0 ? `+${audit.calDiff} kcal OVER 🚨` : `${Math.abs(audit.calDiff)} kcal left`;
+      document.getElementById('audit-day-cal-note').className = `text-[11px] font-bold mt-0.5 ${audit.calDiff > 100 ? 'text-rose-600' : 'text-emerald-600'}`;
+      document.getElementById('audit-day-steps').textContent = `${audit.daySteps.toLocaleString()} / ${audit.tSteps.toLocaleString()}`;
+      document.getElementById('audit-day-steps-note').textContent = audit.stepDiff > 0 ? `${audit.stepDiff.toLocaleString()} baaki` : 'Target Hit ✅';
+      document.getElementById('audit-day-steps-note').className = `text-[11px] font-bold mt-0.5 ${audit.stepDiff > 0 ? 'text-rose-600' : 'text-emerald-600'}`;
+      document.getElementById('daily-blunt-text').textContent = audit.dailyVerdict.text;
+
+      const wStyle = toneStyles[audit.weeklyVerdict.tone];
+      document.getElementById('weekly-audit-card').className = wStyle.card;
+      const wTag = document.getElementById('weekly-verdict-tag');
+      wTag.className = wStyle.tag;
+      wTag.textContent = audit.weeklyVerdict.tag;
+      document.getElementById('audit-wk-cal').textContent = `${audit.wkCalSum.toLocaleString()} / ${audit.wkCalTarget.toLocaleString()}`;
+      document.getElementById('audit-wk-cal-note').textContent = audit.wkCalDiff > 0 ? `+${audit.wkCalDiff.toLocaleString()} kcal over` : `${Math.abs(audit.wkCalDiff).toLocaleString()} kcal under`;
+      document.getElementById('audit-wk-cal-note').className = `text-[11px] font-bold mt-0.5 ${audit.wkCalDiff > 400 ? 'text-rose-600' : 'text-emerald-600'}`;
+      document.getElementById('audit-wk-steps').textContent = `${audit.wkStepSum.toLocaleString()} / ${audit.wkStepTarget.toLocaleString()}`;
+      document.getElementById('audit-wk-steps-note').textContent = `${audit.wkStepPct}% (${audit.stepHitDays}/7 days hit)`;
+      document.getElementById('audit-wk-steps-note').className = `text-[11px] font-bold mt-0.5 ${audit.wkStepPct < 75 ? 'text-rose-600' : 'text-emerald-600'}`;
+      document.getElementById('weekly-blunt-text').textContent = audit.weeklyVerdict.text;
+
+      // Render Blunt Warnings List
+      const warnContainer = document.getElementById('coach-warnings-list');
+      if (audit.warnings.length > 0) {
+        warnContainer.innerHTML = audit.warnings.map(w => `
+          <div class="p-3 rounded-2xl text-xs font-bold leading-relaxed border ${
+            w.level === 'red'
+              ? 'bg-rose-600 text-white border-rose-700'
+              : 'bg-amber-50 text-amber-950 border-amber-300'
+          }">${escapeHtml(w.msg)}</div>
+        `).join('');
+      } else {
+        warnContainer.innerHTML = `<div class="p-3 rounded-2xl text-xs font-bold bg-emerald-50 text-emerald-900 border border-emerald-200">✅ Koi red flag nahi hai aaj. Isi discipline pe tiki reh!</div>`;
+      }
+
+      // Calorie Ring & Macros
       document.getElementById('dash-cal-consumed').textContent = Math.round(totals.cal);
       document.getElementById('dash-cal-target').textContent = tCal;
 
-      // Ring progress (capped at 100% visually, never harsh red)
-      const circumference = 2 * Math.PI * 58; // 364.42
+      const circumference = 2 * Math.PI * 58;
       const ratio = Math.min(totals.cal / tCal, 1);
       document.getElementById('cal-ring').style.strokeDashoffset = circumference * (1 - ratio);
 
-      // Guilt-free calorie status pill
       const diff = Math.round(tCal - totals.cal);
       const statusEl = document.getElementById('dash-cal-status');
-      const encEl = document.getElementById('dash-encouragement');
       if (diff >= 0) {
         statusEl.textContent = `${diff} kcal remaining today`;
         statusEl.className = 'mt-2 text-xs font-semibold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full text-center';
-        const dayIndex = new Date(selectedDate).getDate() % ENCOURAGEMENTS.length;
-        encEl.textContent = ENCOURAGEMENTS[dayIndex];
       } else {
-        statusEl.textContent = `+${Math.abs(diff)} kcal nourished today — all good! ✨`;
-        statusEl.className = 'mt-2 text-xs font-semibold text-indigo-700 bg-indigo-50 px-3 py-1 rounded-full text-center';
-        encEl.textContent = "Enjoyed a fuller meal or treat today? Awesome! Balance is built over weeks, not one day. ❤️";
+        statusEl.textContent = `🚨 +${Math.abs(diff)} kcal OVER LIMIT!`;
+        statusEl.className = 'mt-2 text-xs font-extrabold text-white bg-rose-600 px-3 py-1 rounded-full text-center';
       }
 
-      // Macro bars
       document.getElementById('dash-protein').textContent = Math.round(totals.pro);
       document.getElementById('dash-protein-target').textContent = tPro;
       document.getElementById('bar-protein').style.width = `${Math.min((totals.pro / tPro) * 100, 100)}%`;
@@ -1240,13 +1526,12 @@
         document.getElementById('dash-sleep-sub').textContent = 'Tap to log rest';
       }
 
-      const act = state.activityLogs[selectedDate];
       if (act) {
-        document.getElementById('dash-activity-summary').textContent = `${Number(act.steps || 0).toLocaleString()} steps`;
-        document.getElementById('dash-activity-sub').textContent = act.workout_minutes ? `${act.workout_type} • ${act.workout_minutes}m` : 'Keep moving gently';
+        document.getElementById('dash-activity-summary').textContent = `${daySteps.toLocaleString()} / ${tSteps.toLocaleString()}`;
+        document.getElementById('dash-activity-sub').textContent = act.workout_minutes ? `${act.workout_type} • ${act.workout_minutes}m` : `${audit.dayStepPct}% of daily step goal`;
       } else {
-        document.getElementById('dash-activity-summary').textContent = '0 steps';
-        document.getElementById('dash-activity-sub').textContent = 'Tap to add moves';
+        document.getElementById('dash-activity-summary').textContent = `0 / ${tSteps.toLocaleString()}`;
+        document.getElementById('dash-activity-sub').textContent = '0% — chalna shuru kar!';
       }
 
       const sortedWeights = [...state.weightLogs].sort((a, b) => b.log_date.localeCompare(a.log_date));
@@ -1259,7 +1544,7 @@
     }
 
     // =========================================================================
-    // 7. RENDERING & LOGIC: FOOD TRACKER
+    // 8. RENDERING & LOGIC: FOOD TRACKER
     // =========================================================================
     function selectMealType(type) {
       selectedMealType = type;
@@ -1288,8 +1573,8 @@
       if (filtered.length === 0) {
         container.innerHTML = `
           <div class="text-center py-6 bg-slate-50 rounded-2xl">
-            <p class="text-sm font-semibold text-slate-600">No foods found for "${query}"</p>
-            <button onclick="openCustomFoodModal()" class="mt-2 text-xs font-bold text-indigo-600 hover:underline">+ Add "${query}" as a custom food</button>
+            <p class="text-sm font-semibold text-slate-600">No foods found for "${escapeHtml(query)}"</p>
+            <button onclick="openCustomFoodModal()" class="mt-2 text-xs font-bold text-indigo-600 hover:underline">+ Add "${escapeHtml(query)}" as a custom food</button>
           </div>`;
         return;
       }
@@ -1368,9 +1653,15 @@
       saveLocalState();
       closePortionModal();
       renderAll();
-      showToast(`Logged ${entry.food_name} (${Math.round(entry.calories)} kcal ~Est.)`);
 
-      // Push to Supabase if signed in
+      const dayCal = state.foodLogs.filter(l => l.log_date === selectedDate).reduce((s, x) => s + (Number(x.calories) || 0), 0);
+      const tCal = Number(state.profile.target_calories) || 2000;
+      if (dayCal > tCal) {
+        showToast(`⚠️ Limit cross! Ab ${Math.round(dayCal - tCal)} kcal OVER ho gayi hai!`, 'warn');
+      } else {
+        showToast(`Logged ${entry.food_name} (${Math.round(entry.calories)} kcal)`);
+      }
+
       if (sbClient && currentUser) {
         try {
           const { data, error } = await sbClient.from('food_logs').insert({
@@ -1527,17 +1818,18 @@
     }
 
     // =========================================================================
-    // 8. RENDERING & LOGIC: WELLNESS TRACKER (GUT, SLEEP, ACTIVITY)
+    // 9. RENDERING & LOGIC: WELLNESS TRACKER (GUT, SLEEP, ACTIVITY)
     // =========================================================================
     function renderWellnessTrackers() {
-      // Load Gut
+      const tSteps = Number(state.profile.target_steps) || 10000;
+      document.getElementById('track-step-goal-lbl').textContent = tSteps.toLocaleString();
+
       const gut = state.gutLogs[selectedDate] || { bowel_movement_count: 0, acidity_level: 0, bloating_level: 0, notes: '' };
       gutDraft = { ...gut };
       document.getElementById('gut-bm-count').textContent = gutDraft.bowel_movement_count;
       document.getElementById('gut-notes').value = gutDraft.notes || '';
       renderGutScales();
 
-      // Load Sleep
       const sleep = state.sleepLogs[selectedDate] || { sleep_time: '23:00', wake_time: '07:00', duration_hours: 8.0, quality_rating: 4 };
       document.getElementById('sleep-bedtime').value = extractTimeHHMM(sleep.sleep_time) || '23:00';
       document.getElementById('sleep-waketime').value = extractTimeHHMM(sleep.wake_time) || '07:00';
@@ -1545,12 +1837,15 @@
       calculateSleepDuration();
       renderSleepStars();
 
-      // Load Activity
       const act = state.activityLogs[selectedDate] || { steps: 0, workout_type: 'Walking', workout_minutes: 0, calories_burned: 0 };
       document.getElementById('activity-steps').value = act.steps || '';
       document.getElementById('activity-workout-type').value = act.workout_type || 'Walking';
       document.getElementById('activity-minutes').value = act.workout_minutes || '';
       document.getElementById('activity-burned').value = act.calories_burned || '';
+      const pct = Math.round(((Number(act.steps) || 0) / tSteps) * 100);
+      const pctEl = document.getElementById('track-step-pct');
+      pctEl.textContent = `${pct}%`;
+      pctEl.className = `text-xs font-extrabold px-2.5 py-1 rounded-full ${pct >= 100 ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-700'}`;
     }
 
     function adjustBowel(delta) {
@@ -1624,7 +1919,6 @@
       }
     }
 
-    // Sleep helpers
     function extractTimeHHMM(val) {
       if (!val) return '';
       if (val.length === 5 && val.includes(':')) return val;
@@ -1666,7 +1960,6 @@
       const wake = document.getElementById('sleep-waketime').value || '07:00';
       const duration = calculateSleepDuration();
 
-      // Convert to ISO timestamps for Supabase timestamptz columns
       const sleepIso = new Date(`${selectedDate}T${bed}:00`).toISOString();
       const wakeIso = new Date(`${selectedDate}T${wake}:00`).toISOString();
 
@@ -1701,7 +1994,6 @@
       }
     }
 
-    // Activity helpers
     function addSteps(amount) {
       const el = document.getElementById('activity-steps');
       el.value = (parseInt(el.value, 10) || 0) + amount;
@@ -1720,6 +2012,7 @@
       const workout_type = document.getElementById('activity-workout-type').value;
       const workout_minutes = parseInt(document.getElementById('activity-minutes').value, 10) || 0;
       const calories_burned = parseInt(document.getElementById('activity-burned').value, 10) || 0;
+      const tSteps = Number(state.profile.target_steps) || 10000;
 
       const entry = {
         id: (state.activityLogs[selectedDate] && state.activityLogs[selectedDate].id) || generateLocalId(),
@@ -1732,8 +2025,14 @@
 
       state.activityLogs[selectedDate] = entry;
       saveLocalState();
+      renderWellnessTrackers();
       renderDashboard();
-      showToast(`Activity saved (${steps.toLocaleString()} steps)! 👟`);
+
+      if (steps < tSteps) {
+        showToast(`⚠️ Saved ${steps.toLocaleString()} steps — abhi bhi ${(tSteps - steps).toLocaleString()} steps baaki hain!`, 'warn');
+      } else {
+        showToast(`🔥 ${steps.toLocaleString()} steps! Daily target hit!`);
+      }
 
       if (sbClient && currentUser) {
         try {
@@ -1753,7 +2052,7 @@
     }
 
     // =========================================================================
-    // 9. RENDERING & LOGIC: MEAL PLANNER & REPORTS
+    // 10. RENDERING & LOGIC: MEAL PLANNER & REPORTS
     // =========================================================================
     function renderPlanAndReports() {
       renderPlannerDays();
@@ -1864,7 +2163,6 @@
         return;
       }
       const today = getTodayStr();
-      // Replace existing entry for today if present
       state.weightLogs = state.weightLogs.filter(w => w.log_date !== today);
       state.weightLogs.push({ id: generateLocalId(), log_date: today, weight_kg: val });
       saveLocalState();
@@ -1887,23 +2185,53 @@
     }
 
     function renderCharts() {
-      document.getElementById('chart-cal-target-lbl').textContent = state.profile.target_calories || 2000;
+      const tCal = Number(state.profile.target_calories) || 2000;
+      const tSteps = Number(state.profile.target_steps) || 10000;
+      document.getElementById('chart-cal-target-lbl').textContent = tCal;
+      document.getElementById('chart-step-target-lbl').textContent = tSteps.toLocaleString();
       document.getElementById('chart-wt-target-lbl').textContent = state.profile.target_weight_kg || '--';
 
-      // Build last 7 days labels & calorie sums
-      const labels7 = [];
+      const last7 = getLast7DaysDates();
+      const labels7 = last7.map(d => d.label);
       const cals7 = [];
-      for (let i = 6; i >= 0; i--) {
-        const d = new Date();
-        d.setDate(d.getDate() - i);
-        const offset = d.getTimezoneOffset();
-        const iso = new Date(d.getTime() - offset * 60000).toISOString().split('T')[0];
-        labels7.push(d.toLocaleDateString('en-IN', { weekday: 'short' }));
-        const sum = state.foodLogs
-          .filter(l => l.log_date === iso)
-          .reduce((acc, item) => acc + (Number(item.calories) || 0), 0);
-        cals7.push(Math.round(sum));
-      }
+      const steps7 = [];
+
+      const rowsHTML = last7.map(d => {
+        const c = Math.round(state.foodLogs.filter(l => l.log_date === d.iso).reduce((acc, item) => acc + (Number(item.calories) || 0), 0));
+        const st = Number((state.activityLogs[d.iso] && state.activityLogs[d.iso].steps) || 0);
+        cals7.push(c);
+        steps7.push(st);
+
+        const calOk = c > 0 && c <= tCal + 100;
+        const stepOk = st >= tSteps;
+        const statusBadge = (c === 0 && st === 0)
+          ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-rose-100 text-rose-700">🚨 Missing</span>'
+          : (calOk && stepOk)
+            ? '<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-emerald-100 text-emerald-800">✅ Hit</span>'
+            : '<span class="px-2 py-0.5 rounded-full text-[10px] font-extrabold bg-amber-100 text-amber-800">⚠️ Slipped</span>';
+
+        return `
+          <tr class="border-b border-slate-200/70 last:border-0">
+            <td class="py-2 pr-3 font-bold text-slate-800">${d.label} (${d.shortDate})</td>
+            <td class="py-2 px-3 font-bold ${c > tCal + 100 ? 'text-rose-600' : 'text-slate-700'}">${c} / ${tCal}</td>
+            <td class="py-2 px-3 font-bold ${st < tSteps ? 'text-rose-600' : 'text-emerald-700'}">${st.toLocaleString()} / ${tSteps.toLocaleString()}</td>
+            <td class="py-2 pl-3 text-right">${statusBadge}</td>
+          </tr>`;
+      }).join('');
+
+      document.getElementById('weekly-scorecard-box').innerHTML = `
+        <table class="w-full text-left text-xs">
+          <thead>
+            <tr class="text-[10px] uppercase text-slate-400 border-b border-slate-200">
+              <th class="pb-1.5 pr-3">Day</th>
+              <th class="pb-1.5 px-3">Calories</th>
+              <th class="pb-1.5 px-3">Steps</th>
+              <th class="pb-1.5 pl-3 text-right">Verdict</th>
+            </tr>
+          </thead>
+          <tbody>${rowsHTML}</tbody>
+        </table>
+      `;
 
       const calCtx = document.getElementById('calorieChart').getContext('2d');
       if (calorieChartInstance) calorieChartInstance.destroy();
@@ -1914,9 +2242,9 @@
           datasets: [{
             label: 'Calories (~Est.)',
             data: cals7,
-            backgroundColor: '#10B981',
+            backgroundColor: cals7.map(v => v > tCal + 100 ? '#E11D48' : '#10B981'),
             borderRadius: 8,
-            maxBarThickness: 28,
+            maxBarThickness: 24,
           }],
         },
         options: {
@@ -1930,7 +2258,31 @@
         },
       });
 
-      // Weight Chart
+      const stepCtx = document.getElementById('stepsChart').getContext('2d');
+      if (stepsChartInstance) stepsChartInstance.destroy();
+      stepsChartInstance = new Chart(stepCtx, {
+        type: 'bar',
+        data: {
+          labels: labels7,
+          datasets: [{
+            label: 'Steps',
+            data: steps7,
+            backgroundColor: steps7.map(v => v >= tSteps ? '#4F46E5' : '#F59E0B'),
+            borderRadius: 8,
+            maxBarThickness: 24,
+          }],
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            y: { beginAtZero: true, grid: { color: '#F1F5F9' }, ticks: { font: { size: 10 } } },
+            x: { grid: { display: false }, ticks: { font: { size: 11 } } },
+          },
+        },
+      });
+
       const sortedW = [...state.weightLogs].sort((a, b) => a.log_date.localeCompare(b.log_date)).slice(-10);
       const wLabels = sortedW.length ? sortedW.map(w => w.log_date.slice(5)) : ['Today'];
       const wData = sortedW.length ? sortedW.map(w => w.weight_kg) : [null];
@@ -1965,11 +2317,12 @@
     }
 
     // =========================================================================
-    // 10. SETTINGS & SUPABASE CLOUD SYNC
+    // 11. SETTINGS & SUPABASE CLOUD SYNC
     // =========================================================================
     function renderSettings() {
       document.getElementById('set-name').value = state.profile.full_name || '';
       document.getElementById('set-calories').value = state.profile.target_calories || 2000;
+      document.getElementById('set-steps').value = state.profile.target_steps || 10000;
       document.getElementById('set-protein').value = state.profile.target_protein_g || 120;
       document.getElementById('set-carbs').value = state.profile.target_carbs_g || 220;
       document.getElementById('set-fat').value = state.profile.target_fat_g || 65;
@@ -1988,6 +2341,7 @@
       state.profile = {
         full_name: document.getElementById('set-name').value.trim() || 'Friend',
         target_calories: parseInt(document.getElementById('set-calories').value, 10) || 2000,
+        target_steps: parseInt(document.getElementById('set-steps').value, 10) || 10000,
         target_protein_g: parseInt(document.getElementById('set-protein').value, 10) || 120,
         target_carbs_g: parseInt(document.getElementById('set-carbs').value, 10) || 220,
         target_fat_g: parseInt(document.getElementById('set-fat').value, 10) || 65,
@@ -1995,13 +2349,18 @@
       };
       saveLocalState();
       renderDashboard();
-      showToast('Personalised targets updated! 🎯');
+      showToast('Personalised targets updated! Ab बहाने band 🎯');
 
       if (sbClient && currentUser) {
         try {
           await sbClient.from('profiles').upsert({
             id: currentUser.id,
-            ...state.profile,
+            full_name: state.profile.full_name,
+            target_calories: state.profile.target_calories,
+            target_protein_g: state.profile.target_protein_g,
+            target_carbs_g: state.profile.target_carbs_g,
+            target_fat_g: state.profile.target_fat_g,
+            target_weight_kg: state.profile.target_weight_kg,
           });
         } catch (e) {
           console.warn('Cloud profile sync error:', e);
@@ -2010,21 +2369,21 @@
     }
 
     function initSupabaseFromStorage() {
-  try {
-    const saved = JSON.parse(localStorage.getItem(SB_CONFIG_KEY) || '{}');
-    const cfg = {
-      url: saved.url || 'https://dkfkqrazmcyjvkzbdrvl.supabase.co',
-      key: saved.key || 'sb_publishable_6ef9CigBIIYtv9KfOFkihQ_prCmjkuM'
-    };
-    localStorage.setItem(SB_CONFIG_KEY, JSON.stringify(cfg));
-    if (cfg.url && cfg.key && window.supabase) {
-      sbClient = window.supabase.createClient(cfg.url, cfg.key);
-      checkSupabaseSession();
+      try {
+        const saved = JSON.parse(localStorage.getItem(SB_CONFIG_KEY) || '{}');
+        const cfg = {
+          url: saved.url || 'https://dkfkqrazmcyjvkzbdrvl.supabase.co',
+          key: saved.key || 'sb_publishable_6ef9CigBIIYtv9KfOFkihQ_prCmjkuM'
+        };
+        localStorage.setItem(SB_CONFIG_KEY, JSON.stringify(cfg));
+        if (cfg.url && cfg.key && window.supabase) {
+          sbClient = window.supabase.createClient(cfg.url, cfg.key);
+          checkSupabaseSession();
+        }
+      } catch (e) {
+        console.warn('Could not initialize Supabase:', e);
+      }
     }
-  } catch (e) {
-    console.warn('Could not initialize Supabase:', e);
-  }
-}
 
     function saveSupabaseConfig() {
       const url = document.getElementById('sb-url').value.trim();
@@ -2121,10 +2480,10 @@
       try {
         const uid = currentUser.id;
 
-        // 1. Profile
         const { data: prof } = await sbClient.from('profiles').select('*').eq('id', uid).maybeSingle();
         if (prof) {
           state.profile = {
+            ...state.profile,
             full_name: prof.full_name || state.profile.full_name,
             target_calories: prof.target_calories || 2000,
             target_protein_g: prof.target_protein_g || 120,
@@ -2133,10 +2492,17 @@
             target_weight_kg: prof.target_weight_kg,
           };
         } else {
-          await sbClient.from('profiles').upsert({ id: uid, ...state.profile });
+          await sbClient.from('profiles').upsert({
+            id: uid,
+            full_name: state.profile.full_name,
+            target_calories: state.profile.target_calories,
+            target_protein_g: state.profile.target_protein_g,
+            target_carbs_g: state.profile.target_carbs_g,
+            target_fat_g: state.profile.target_fat_g,
+            target_weight_kg: state.profile.target_weight_kg,
+          });
         }
 
-        // 2. Pull Cloud Tables in parallel
         const [foodsRes, foodLogsRes, mealPlansRes, gutRes, sleepRes, actRes, weightRes] = await Promise.all([
           sbClient.from('foods').select('*').eq('user_id', uid),
           sbClient.from('food_logs').select('*').eq('user_id', uid),
@@ -2152,15 +2518,9 @@
         if (mealPlansRes.data && mealPlansRes.data.length) state.mealPlans = mealPlansRes.data;
         if (weightRes.data && weightRes.data.length) state.weightLogs = weightRes.data;
 
-        if (gutRes.data) {
-          gutRes.data.forEach(g => { state.gutLogs[g.log_date] = g; });
-        }
-        if (sleepRes.data) {
-          sleepRes.data.forEach(s => { state.sleepLogs[s.log_date] = s; });
-        }
-        if (actRes.data) {
-          actRes.data.forEach(a => { state.activityLogs[a.log_date] = a; });
-        }
+        if (gutRes.data) gutRes.data.forEach(g => { state.gutLogs[g.log_date] = g; });
+        if (sleepRes.data) sleepRes.data.forEach(s => { state.sleepLogs[s.log_date] = s; });
+        if (actRes.data) actRes.data.forEach(a => { state.activityLogs[a.log_date] = a; });
 
         saveLocalState();
         renderAll();
@@ -2202,7 +2562,7 @@
     }
 
     // =========================================================================
-    // 11. MASTER RENDER & INITIALIZATION
+    // 12. MASTER RENDER & INITIALIZATION
     // =========================================================================
     function renderAll() {
       const dInfo = formatDisplayDate(selectedDate);
@@ -2224,7 +2584,9 @@
       loadLocalState();
       initSupabaseFromStorage();
       switchTab('dashboard');
-    });// Smart Natural-Language Nutrition Auto-Calculator
+    });
+
+    // Smart Natural-Language Nutrition Auto-Calculator
     const SMART_FOOD_DB = [
       { keys: ['egg white', 'egg whites'], unit: 'pc', cal: 17, pro: 3.6, carb: 0.2, fat: 0.1 },
       { keys: ['egg yellow', 'egg yellows', 'egg yolk', 'egg yolks', 'yolk', 'yolks'], unit: 'pc', cal: 55, pro: 2.7, carb: 0.6, fat: 4.5 },
@@ -2253,6 +2615,7 @@
       { keys: ['dosa'], unit: 'pc', cal: 168, pro: 3.9, carb: 29, fat: 3.7 },
       { keys: ['sugar'], unit: 'tsp', cal: 16, pro: 0, carb: 4, fat: 0 }
     ];
+
     function bindManualMacroCalc() {
       ['cf-pro', 'cf-carb', 'cf-fat'].forEach(id => {
         const el = document.getElementById(id);
@@ -2269,7 +2632,6 @@
     }
     window.addEventListener('DOMContentLoaded', bindManualMacroCalc);
 
-    // 2. Custom Saved Ingredients + Smart Calculator
     const CUSTOM_ING_KEY = 'm55_custom_ingredients_v1';
 
     function getSavedIngredients() {
@@ -2294,7 +2656,7 @@
       autoCalculateCustomFood();
     }
 
-     async function fetchUSDAFood(part) {
+    async function fetchUSDAFood(part) {
       try {
         const cleanQuery = part
           .replace(/(\d+(?:\.\d+)?)\s*(g|gm|grams|ml|tsp|tbsp|scoop|scoops|katori|cup|cups|slice|slices|pc|pcs)?/gi, '')
@@ -2319,8 +2681,6 @@
         const cal = getNut('208', 'energy') || Math.round((pro * 4) + (carb * 4) + (fat * 9));
 
         const fetched = { keys: [cleanQuery.toLowerCase()], unit: '100g', cal, pro, carb, fat };
-
-        // Auto-save so it's instant next time
         const saved = getSavedIngredients();
         saved.unshift(fetched);
         localStorage.setItem(CUSTOM_ING_KEY, JSON.stringify(saved));
@@ -2411,6 +2771,7 @@
       statusEl.innerHTML = html;
       statusEl.classList.remove('hidden');
     }
+
     // =========================================================
     // PINNED TREND, WATER, GUT CHECK-IN & SHIFT MEAL PLANNER
     // =========================================================
@@ -2595,7 +2956,6 @@
       }
     }
 
-    // Check every 30 seconds if a scheduled meal/water time is reached
     setInterval(() => {
       if (!('Notification' in window) || Notification.permission !== 'granted') return;
       const now = new Date();
@@ -2611,7 +2971,9 @@
       }
     }, 30000);
 
-    window.addEventListener('DOMContentLoaded', loadShiftExtras);function exportMission55Backup() {
+    window.addEventListener('DOMContentLoaded', loadShiftExtras);
+
+    function exportMission55Backup() {
       const data = {};
       for (let i = 0; i < localStorage.length; i++) {
         const k = localStorage.key(i);
