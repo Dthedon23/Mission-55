@@ -1490,11 +1490,9 @@
       document.getElementById('audit-wk-steps-note').className = `text-[11px] font-bold mt-0.5 ${audit.wkStepPct < 75 ? 'text-rose-600' : 'text-emerald-600'}`;
       document.getElementById('weekly-blunt-text').textContent = audit.weeklyVerdict.text;
 
-      const warnContainer = document.getElementById('coach-warnings-list');
+    const warnContainer = document.getElementById('coach-warnings-list');
       if (audit.warnings.length > 0) {
         warnContainer.innerHTML = audit.warnings.map(w => `
-        document.getElementById('coach-bad-food-list').innerHTML = audit.badFoodAnalysis.map(x => `<li>${escapeHtml(x)}</li>`).join('');
-      document.getElementById('coach-missing-list').innerHTML = audit.missingAnalysis.map(x => `<li>${escapeHtml(x)}</li>`).join('');
           <div class="p-3 rounded-2xl text-xs font-bold leading-relaxed border ${
             w.level === 'red'
               ? 'bg-rose-600 text-white border-rose-700'
@@ -1505,8 +1503,8 @@
         warnContainer.innerHTML = `<div class="p-3 rounded-2xl text-xs font-bold bg-emerald-50 text-emerald-900 border border-emerald-200">✅ Koi red flag nahi hai aaj. Isi discipline pe tiki reh!</div>`;
       }
 
-      document.getElementById('dash-cal-consumed').textContent = Math.round(totals.cal);
-      document.getElementById('dash-cal-target').textContent = tCal;
+      document.getElementById('coach-bad-food-list').innerHTML = audit.badFoodAnalysis.map(x => `<li>${escapeHtml(x)}</li>`).join('');
+      document.getElementById('coach-missing-list').innerHTML = audit.missingAnalysis.map(x => `<li>${escapeHtml(x)}</li>`).join('');
 
       const circumference = 2 * Math.PI * 58;
       const ratio = Math.min(totals.cal / tCal, 1);
