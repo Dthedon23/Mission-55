@@ -236,7 +236,24 @@
             <p id="weekly-blunt-text" class="text-xs font-bold text-slate-800 leading-relaxed pt-1"></p>
           </div>
         </div>
+<!-- SEPARATE ANALYSIS: WHAT WENT WRONG vs WHAT IS SHORT -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+          <div class="rounded-2xl p-4 bg-rose-50/60 border border-rose-200 space-y-2">
+            <div class="flex items-center justify-between">
+              <h4 class="text-xs font-extrabold uppercase tracking-wider text-rose-800">🍔 Kya Galat / Over Hua</h4>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-700">Food Audit</span>
+            </div>
+            <ul id="coach-bad-food-list" class="space-y-1.5 text-xs font-semibold text-rose-950"></ul>
+          </div>
 
+          <div class="rounded-2xl p-4 bg-amber-50/60 border border-amber-200 space-y-2">
+            <div class="flex items-center justify-between">
+              <h4 class="text-xs font-extrabold uppercase tracking-wider text-amber-900">📉 Kya Kam Reh Gaya</h4>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">Shortfall</span>
+            </div>
+            <ul id="coach-missing-list" class="space-y-1.5 text-xs font-semibold text-amber-950"></ul>
+          </div>
+        </div>
         <div id="coach-warnings-list" class="space-y-2"></div>
       </div>
 
@@ -1476,6 +1493,8 @@
       const warnContainer = document.getElementById('coach-warnings-list');
       if (audit.warnings.length > 0) {
         warnContainer.innerHTML = audit.warnings.map(w => `
+        document.getElementById('coach-bad-food-list').innerHTML = audit.badFoodAnalysis.map(x => `<li>${escapeHtml(x)}</li>`).join('');
+      document.getElementById('coach-missing-list').innerHTML = audit.missingAnalysis.map(x => `<li>${escapeHtml(x)}</li>`).join('');
           <div class="p-3 rounded-2xl text-xs font-bold leading-relaxed border ${
             w.level === 'red'
               ? 'bg-rose-600 text-white border-rose-700'
@@ -3045,6 +3064,242 @@
         }
       };
       reader.readAsText(file);
+    }
+    function getWaterGlasses() {
+      try {
+        const d = JSON.parse(localStorage.getItem(SHIFT_STORE_KEY) || '{}');
+        return Number(d.water) || 0;
+      } catch (e) {
+        return 0;
+      }
+    }
+
+    function evaluateStrictAccountability(dayTotals, daySteps) {
+      const name = state.profile.full_name || 'Boss';
+      const tCal = Number(state.profile.target_calories) || 2000;
+      const tSteps = Number(state.profile.target_steps) || 10000;
+      const tPro = Number(state.profile.target_protein_g) || 120;
+      const tFat = Number(state.profile.target_fat_g) || 65;
+      const tFiber = Number(state.profile.target_fiber_g) || 28;
+      const tWater = 12;
+
+      const dayCal = Math.round(dayTotals.cal);
+      const dayPro = Math.round(dayTotals.pro);
+      const dayFat = Number(dayTotals.fat.toFixed(1));
+      const dayFiber = Number(dayTotals.fiber.toFixed(1));
+      const dayWater = getWaterGlasses();
+
+      const calDiff = dayCal - tCal;
+      const stepDiff = tSteps - daySteps;
+
+      const last7 = getLast7DaysDates();
+      let wkCalSum = 0;
+      let wkStepSum = 0;
+      let wkFiberSum = 0;
+      let loggedFoodDays = 0;
+      let stepHitDays = 0;
+      let overCalDays = 0;
+
+      last7.forEach(d => {
+        const logs = state.foodLogs.filter(l => l.log_date === d.iso);
+        const c = logs.reduce((s, x) => s + (Number(x.calories) || 0), 0);
+        const fib = logs.reduce((s, x) => s + (Number(x.fiber_g) || 0), 0);
+        const st = Number((state.activityLogs[d.iso] && state.activityLogs[d.iso].steps) || 0);
+        wkCalSum += c;
+        wkFiberSum += fib;
+        wkStepSum += st;
+        if (c > 0) loggedFoodDays++;
+        if (c > tCal + 100) overCalDays++;
+        if (st >= tSteps) stepHitDays++;
+      });
+
+      const wkCalTarget = tCal * 7;
+      const wkStepTarget = tSteps * 7;
+      const wkCalDiff = Math.round(wkCalSum - wkCalTarget);
+      const wkStepPct = Math.round((wkStepSum / Math.max(1, wkStepTarget)) * 100);
+      const dayStepPct = Math.round((daySteps / Math.max(1, tSteps)) * 100);
+
+      const warnings = [];
+      const badFoodAnalysis = [];
+      const missingAnalysis = [];
+
+      // ---- 1. KYA GALAT / OVER HUA (SEPARATE ANALYSIS) ----
+      const dayLogs = state.foodLogs.filter(l => l.log_date === selectedDate);
+      const heavyItems = dayLogs.filter(item => {
+        const n = (item.food_name || '').toLowerCase();
+        return (
+          n.includes('tiramisu') ||
+          n.includes('chai') ||
+          n.includes('paratha') ||
+          n.includes('subway') ||
+          Number(item.fat_g) >= 15 ||
+          Number(item.calories) >= 350
+        );
+      });
+
+      if (heavyItems.length > 0) {
+        heavyItems.forEach(it => {
+          const nLower = (it.food_name || '').toLowerCase();
+          let reason = `${Math.round(it.calories)} kcal, ${Number(it.fat_g || 0).toFixed(1)}g fat`;
+          if (nLower.includes('tiramisu')) reason = `Sugar + fat bomb (${Math.round(it.calories)} kcal, ${Number(it.fat_g || 0).toFixed(1)}g fat) — craving aur calorie spike dono`;
+          else if (nLower.includes('chai')) reason = `Sugar + milk/fat (${Math.round(it.calories)} kcal) — baar-baar piya toh calories chupke se badhengi`;
+          else if (nLower.includes('paratha')) reason = `Heavy calories/fat (${Math.round(it.calories)} kcal) — portion control zaroori`;
+          badFoodAnalysis.push(`• ${it.food_name} (×${it.quantity}): ${reason}`);
+        });
+      }
+
+      if (calDiff > 100) {
+        badFoodAnalysis.push(`• Calorie Limit Cross: Aaj target (${tCal} kcal) se +${calDiff} kcal zyada kha liya hai.`);
+      }
+      if (dayFat > tFat + 5) {
+        badFoodAnalysis.push(`• Fat Limit Cross: Fat ${dayFat}g / ${tFat}g ho gaya (+${(dayFat - tFat).toFixed(1)}g extra).`);
+      }
+      if (badFoodAnalysis.length === 0) {
+        badFoodAnalysis.push(dayCal === 0
+          ? '• Aaj abhi tak koi food log nahi hua — ya toh khaya nahi ya chhupa rahi hai.'
+          : '• Aaj koi bada calorie/heavy-food slip nahi pakda gaya.');
+      }
+
+      // ---- 2. KYA KAM REH GAYA (SEPARATE SHORTFALL ANALYSIS) ----
+      if (stepDiff > 0) {
+        missingAnalysis.push(`• Steps: ${stepDiff.toLocaleString()} steps kam (${daySteps.toLocaleString()} / ${tSteps.toLocaleString()}).`);
+      }
+      if (dayPro < tPro) {
+        missingAnalysis.push(`• Protein: ${Math.max(0, tPro - dayPro)}g kam (${dayPro}g / ${tPro}g) — dal, paneer, egg/chicken ya whey badha.`);
+      }
+      if (dayFiber < tFiber) {
+        missingAnalysis.push(`• Fiber: ${(tFiber - dayFiber).toFixed(1)}g kam (${dayFiber}g / ${tFiber}g) — salad, oats, roti, fruit ya chia le.`);
+      }
+      if (dayWater < tWater) {
+        missingAnalysis.push(`• Water: ${tWater - dayWater} glasses (${((tWater - dayWater) * 0.25).toFixed(2)}L) kam (${dayWater}/${tWater} glasses = ${(dayWater * 0.25).toFixed(2)}L).`);
+      }
+      if (missingAnalysis.length === 0) {
+        missingAnalysis.push('• Aaj Steps, Protein, Fiber aur Water sab target pe hain!');
+      }
+
+      // ---- 3. WATER WARNING ----
+      if (dayWater < 6) {
+        warnings.push({
+          level: 'red',
+          msg: `💧 PAANI BAHUT KAM HAI: Sirf ${dayWater}/${tWater} glasses (${(dayWater * 0.25).toFixed(2)}L) piya hai! Kam paani se bloating, constipation aur fake bhookh lagti hai — abhi 2 glass paani pee.`
+        });
+      } else if (dayWater < 9) {
+        warnings.push({
+          level: 'amber',
+          msg: `💧 WATER CHECK: ${dayWater}/${tWater} glasses (${(dayWater * 0.25).toFixed(2)}L) hua hai. 12 glasses (3L) tak le ja taaki digestion aur energy dono tight rahein.`
+        });
+      }
+
+      // ---- 4. DAILY & WEEKLY VERDICTS + OTHER WARNINGS ----
+      let dailyVerdict = { tag: 'ON TRACK', tone: 'good', text: '' };
+      let weeklyVerdict = { tag: 'ON PACE', tone: 'good', text: '' };
+
+      if (dayCal === 0 && daySteps === 0) {
+        dailyVerdict = {
+          tag: 'ZERO LOGGED 🚨',
+          tone: 'bad',
+          text: `${name}, aaj na khana log kiya hai na steps! Tracker khali chhodne se weight kam nahi hota — abhi log kar warna din waste samajh.`
+        };
+        warnings.push({ level: 'red', msg: `🚨 KHAALI DIN: Aaj 0 kcal, ${dayFiber}g fiber aur 0 steps logged hain. Bahane band kar aur log daal.` });
+      } else if (calDiff > 150 && daySteps < tSteps * 0.6) {
+        dailyVerdict = {
+          tag: 'RED ALERT 🛑',
+          tone: 'bad',
+          text: `Limit se +${calDiff} kcal zyada kha liya aur steps sirf ${daySteps.toLocaleString()} (${dayStepPct}%)! Khaana full speed mein aur chalna zero — aise Mission 55 kabhi poora nahi hoga.`
+        };
+        warnings.push({ level: 'red', msg: `🛑 DOUBLE DAMAGE: ${calDiff} kcal extra + ${stepDiff.toLocaleString()} steps kam. Abhi walk pe nikal!` });
+      } else if (calDiff > 150) {
+        dailyVerdict = {
+          tag: 'OVER BUDGET ⚠️',
+          tone: 'warn',
+          text: `Steps toh ${daySteps.toLocaleString()} kar liye, par ${calDiff} kcal target ke upar chala gaya! Extra walk karke bhi plate pe control nahi rakha toh deficit khatam.`
+        };
+        warnings.push({ level: 'amber', msg: `⚠️ CALORIE OVERFLOW: Target se +${calDiff} kcal upar hai. Kal strictly ${Math.max(1200, tCal - Math.min(300, calDiff))} kcal pe reh.` });
+      } else if (daySteps < tSteps * 0.5) {
+        dailyVerdict = {
+          tag: 'LAZY STEPS 🐢',
+          tone: 'bad',
+          text: `Calories (${dayCal} kcal) control mein hain, par steps sirf ${daySteps.toLocaleString()} / ${tSteps.toLocaleString()} hain! Sirf kam khaane se body tight nahi hoti — uth aur ${stepDiff.toLocaleString()} steps poore kar.`
+        };
+        warnings.push({ level: 'red', msg: `👟 STEP SHORTFALL: Abhi bhi ${stepDiff.toLocaleString()} steps baaki hain. Chalna shuru kar!` });
+      } else if (daySteps < tSteps) {
+        dailyVerdict = {
+          tag: 'ADHURA TARGET ⏳',
+          tone: 'warn',
+          text: `Calories sahi ja rahi hain (${dayCal}/${tCal} kcal), par ${stepDiff.toLocaleString()} steps abhi bhi pending hain. Aadha-adhoora kaam mat chhod, aaj hi finish kar!`
+        };
+      } else {
+        dailyVerdict = {
+          tag: 'SOLID DISCIPLINE ✅',
+          tone: 'good',
+          text: `Badiya! ${dayCal}/${tCal} kcal aur ${daySteps.toLocaleString()} steps dono hit kiye. Bas yahi consistency chahiye — kal phir repeat karna, overconfident mat hona.`
+        };
+      }
+
+      if (dayCal > 600 && dayPro < tPro * 0.55) {
+        warnings.push({ level: 'amber', msg: `🥩 PROTEIN BAHUT KAM HAI: Sirf ${dayPro}g / ${tPro}g protein liya hai. Muscle bachani hai toh protein badha!` });
+      }
+      if (dayCal > 700 && dayFiber < tFiber * 0.5) {
+        warnings.push({ level: 'amber', msg: `🌾 FIBER ZERO CHAL RAHA HAI: Sirf ${dayFiber}g / ${tFiber}g fiber liya hai! Pet saaf rakhne aur bhookh rokne ke liye fiber badha.` });
+      }
+      const gutToday = state.gutLogs[selectedDate];
+      if (gutToday && (gutToday.acidity_level >= 3 || gutToday.bloating_level >= 3)) {
+        warnings.push({ level: 'amber', msg: `🌿 GUT WARNING: Acidity ${gutToday.acidity_level}/5, Bloating ${gutToday.bloating_level}/5. Late-night chai, maida aur bahar ka khana turant band kar.` });
+      }
+
+      if (loggedFoodDays < 4) {
+        weeklyVerdict = {
+          tag: 'LAAPARWAH HAFTA 🚨',
+          tone: 'bad',
+          text: `Pichhle 7 din mein sirf ${loggedFoodDays}/7 din food log kiya aur total steps ${wkStepSum.toLocaleString()} (${wkStepPct}%) hain. Half-tracking se sirf khud ko dhokha milta hai!`
+        };
+        warnings.push({ level: 'red', msg: `📉 WEEKLY AUDIT FAIL: Hafte mein ${7 - loggedFoodDays} din ka data gayab hai. Roz log kar!` });
+      } else if (wkCalDiff > 500 && wkStepPct < 75) {
+        weeklyVerdict = {
+          tag: 'OFF TRACK WEEK 🛑',
+          tone: 'bad',
+          text: `7-day calories weekly budget se +${wkCalDiff.toLocaleString()} kcal zyada hain aur steps sirf ${wkStepPct}% (${stepHitDays}/7 din target hit). Is week fat loss nahi ho raha, seedha bol raha hoon!`
+        };
+        warnings.push({ level: 'red', msg: `🚨 WEEKLY REALITY CHECK: Weekly calorie surplus +${wkCalDiff} kcal aur ${7 - stepHitDays} din step target miss.` });
+      } else if (wkStepPct < 75) {
+        weeklyVerdict = {
+          tag: 'WEAK MOVEMENT ⚠️',
+          tone: 'warn',
+          text: `7-day calories (${Math.round(wkCalSum).toLocaleString()} kcal) toh control mein hain, par weekly steps sirf ${wkStepSum.toLocaleString()} / ${wkStepTarget.toLocaleString()} (${wkStepPct}%) hain. Sirf ${stepHitDays}/7 din target hit hua — movement badha!`
+        };
+        warnings.push({ level: 'amber', msg: `⚠️ WEEKLY STEPS LOW: Hafte ke target se ${(wkStepTarget - wkStepSum).toLocaleString()} steps peeche chal rahi hai.` });
+      } else if (wkCalDiff > 400 || overCalDays >= 3) {
+        weeklyVerdict = {
+          tag: 'CALORIE LEAK ⚠️',
+          tone: 'warn',
+          text: `Steps toh ${wkStepPct}% hit hain, par ${overCalDays}/7 din calorie limit todi (+${wkCalDiff} kcal weekly). Weekend/treat ke naam pe saari mehnat mitti mat kar.`
+        };
+      } else {
+        const avgFib = (wkFiberSum / Math.max(1, loggedFoodDays)).toFixed(1);
+        weeklyVerdict = {
+          tag: 'STRONG WEEK 🔥',
+          tone: 'good',
+          text: `7-day average bilkul sahi track pe hai: ${Math.round(wkCalSum).toLocaleString()} / ${wkCalTarget.toLocaleString()} kcal, ${wkStepSum.toLocaleString()} steps (${wkStepPct}%), avg ${avgFib}g fiber/day!`
+        };
+      }
+
+      let bannerHeadline = dailyVerdict.text;
+      let gradeText = 'ON TRACK ✅';
+      if (dailyVerdict.tone === 'bad' || weeklyVerdict.tone === 'bad') {
+        gradeText = 'STRICT WARNING 🚨';
+      } else if (dailyVerdict.tone === 'warn' || weeklyVerdict.tone === 'warn') {
+        gradeText = 'NEEDS FOCUS ⚠️';
+      }
+
+      return {
+        dayCal, tCal, calDiff,
+        daySteps, tSteps, stepDiff, dayStepPct,
+        wkCalSum: Math.round(wkCalSum), wkCalTarget, wkCalDiff,
+        wkStepSum, wkStepTarget, wkStepPct, stepHitDays,
+        dailyVerdict, weeklyVerdict, warnings,
+        badFoodAnalysis, missingAnalysis,
+        bannerHeadline, gradeText
+      };
     }
   </script>
 </body>
